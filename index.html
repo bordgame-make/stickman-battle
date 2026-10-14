@@ -48,6 +48,11 @@ h1 span{color:var(--hi)}
 .prow2 input[type=range]{flex:1;min-width:50px;accent-color:var(--hi);height:3px}
 .prow2 b{flex:0 0 40px;text-align:right;color:var(--hi);font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
 .pdot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
+input.pdot{width:15px;height:15px;flex:0 0 15px;padding:0;border:1px solid var(--line);
+  background:none;cursor:pointer;border-radius:50%;overflow:hidden}
+input.pdot::-webkit-color-swatch-wrapper{padding:0}
+input.pdot::-webkit-color-swatch{border:none;border-radius:50%}
+input.pdot:hover{border-color:var(--hi)}
 .pname{flex:0 0 92px;font-size:11px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prow input[type=range]{flex:1;min-width:50px;accent-color:var(--hi);height:3px}
 .prow b{flex:0 0 40px;text-align:right;color:var(--hi);font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
@@ -97,6 +102,26 @@ h1 span{color:var(--hi)}
   border-radius:8px;padding:6px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
 .presets button:hover{border-color:#4a5a6e;color:var(--ink)}
 @media(max-width:1100px){#mini{width:330px;height:74px}}
+.tabs{display:flex;gap:8px;justify-content:center;margin:14px 0 4px}
+.tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:10px;
+  padding:9px 26px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
+.tabs button.on{background:var(--hi);border-color:var(--hi);color:#1a1206}
+.tabs button:hover{border-color:#4a5a6e}
+#hireBox{flex:0 0 340px;background:var(--panel);border-right:1px solid var(--line);
+  display:none;flex-direction:column;overflow:auto;padding:10px}
+.hpanel{border:1px solid var(--line);border-radius:10px;padding:9px;margin-bottom:10px;background:var(--panel2)}
+.hpanel h4{font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.hcoin{margin-left:auto;color:var(--hi);font-variant-numeric:tabular-nums;font-size:13px}
+.hsub{font-size:10.5px;color:var(--dim);margin-bottom:7px}
+.hbtns{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.hbtns button{background:#121820;border:1px solid var(--line);color:var(--ink);border-radius:7px;
+  padding:6px 5px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;line-height:1.3}
+.hbtns button:hover:not(:disabled){border-color:var(--hi)}
+.hbtns button:disabled{color:#4d5868;cursor:default;border-color:#1e2630}
+.hbtns button i{display:block;font-style:normal;color:var(--hi);font-weight:800;font-size:10px}
+.hbtns button.shop{border-left:3px solid #ffd76a}
+.hbtns button:disabled.shop{border-left-color:#4a412a}
+.hai{font-size:10.5px;color:var(--dim);text-align:center;padding:5px}
 #tip{position:absolute;left:12px;bottom:10px;font-size:11.5px;color:var(--dim);background:rgba(13,17,23,.7);padding:6px 10px;border-radius:8px}
 @media(max-width:1100px){#plinkoBox{flex:0 0 300px}}
 </style>
@@ -105,7 +130,12 @@ h1 span{color:var(--hi)}
 
 <div id="setup"><div class="wrap">
   <h1>플링코 <span>배틀 시뮬레이터</span></h1>
-  <p class="sub">7초마다 양 팀의 공이 하나씩 떨어진다. 공이 어느 칸에 빠지느냐가 병력을 결정하고, 병력이 상대 베이스를 부수면 이긴다.</p>
+  <p class="sub" id="subTxt">7초마다 양 팀의 공이 하나씩 떨어진다. 공이 어느 칸에 빠지느냐가 병력을 결정하고, 병력이 상대 베이스를 부수면 이긴다.</p>
+
+  <div class="tabs">
+    <button class="tab on" data-mode="sim">시뮬레이션</button>
+    <button class="tab" data-mode="hire">고용</button>
+  </div>
 
   <div class="picks">
     <div class="side">
@@ -125,6 +155,58 @@ h1 span{color:var(--hi)}
     </div>
   </div>
 
+  <div class="opts" id="hireOpts" style="display:none">
+    <div class="row">
+      <label for="ctlA">왼쪽 조종</label>
+      <button class="mini on" id="ctlA" style="flex:1;padding:7px">사람</button>
+      <label for="ctlB" style="margin-left:6px">오른쪽 조종</label>
+      <button class="mini" id="ctlB" style="flex:1;padding:7px">AI</button>
+    </div>
+    <div class="presets">
+      <button data-ctl="pvp">PvP (사람 vs 사람)</button>
+      <button data-ctl="pve">PvE (사람 vs AI)</button>
+      <button data-ctl="eve">EvE (AI vs AI)</button>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <label for="coinNum">기본 코인</label>
+      <input type="number" id="coinNum" min="0" step="1" value="10">
+      <b id="coinVal">개</b>
+    </div>
+    <div class="presets">
+      <button data-coin="0">0개</button>
+      <button data-coin="10">기본 10개</button>
+      <button data-coin="40">40개</button>
+      <button data-coin="150">150개</button>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <label for="incRange">코인 들어오는 간격</label>
+      <input type="range" id="incRange" min="1" max="60" step="1" value="10">
+      <b id="incVal">10초</b>
+    </div>
+    <div class="presets">
+      <button data-inc="3">3초</button>
+      <button data-inc="10">기본 10초</button>
+      <button data-inc="20">20초</button>
+      <button data-inc="45">45초</button>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <label for="wRange">처치 가중치 W</label>
+      <input type="range" id="wRange" min="0" max="2" step="0.01" value="0.67">
+      <b id="wVal">0.67배</b>
+    </div>
+    <div class="presets">
+      <button data-w="0">0배 (없음)</button>
+      <button data-w="0.67">기본 0.67배</button>
+      <button data-w="1">1배</button>
+      <button data-w="1.5">1.5배</button>
+    </div>
+    <div class="hint">코인 하나가 공 하나다. 병사를 사면 그 값만큼 코인이 빠진다.<br>
+    적 병사를 잡으면 <b>그 병사 값 × W</b>를 반올림한 만큼 코인이 들어온다. 비싼 병사를 잡을수록 많이 받는다.<br>
+    정해둔 간격마다 양쪽에 코인이 하나씩 들어온다. 간격을 줄이면 전투가 빨라진다.<br>
+    고용에서는 한 진영에 팀을 하나만 고른다. 조종을 <b>사람</b>으로 두면 옆 패널의 버튼으로 직접 사고, <b>AI</b>로 두면 알아서 산다.<br>
+    WEAPON 병사는 1~4코인으로 싸고, SHOP 병사는 플링코에서 필요한 공 개수를 그대로 쓴다. 같은 급이면 원거리가 더 비싸다.</div>
+  </div>
+
   <div class="opts">
     <div class="row">
       <label for="hpRange">베이스 체력</label>
@@ -137,12 +219,12 @@ h1 span{color:var(--hi)}
       <button data-hp="5000">공성전 5,000</button>
       <button data-hp="10000">장기전 10,000</button>
     </div>
-    <div class="row" style="margin-top:16px">
+    <div class="row simonly" style="margin-top:16px">
       <label for="ivRange">공 나오는 간격</label>
       <input type="range" id="ivRange" min="1" max="20" step="0.5" value="7">
       <b id="ivVal">7초</b>
     </div>
-    <div class="presets">
+    <div class="presets simonly">
       <button data-iv="2">2초</button>
       <button data-iv="4">4초</button>
       <button data-iv="7">기본 7초</button>
@@ -181,16 +263,16 @@ h1 span{color:var(--hi)}
       <button data-sz="1.6">거인 1.6배</button>
       <button data-sz="2.5">초거대 2.5배</button>
     </div>
-    <div class="row" style="margin-top:16px">
+    <div class="row simonly" style="margin-top:16px">
       <label for="shopTgl">SHOP 보드</label>
       <button class="mini on" id="shopTgl" style="flex:1;padding:7px">사용함</button>
     </div>
-    <div class="row" style="margin-top:16px">
+    <div class="row simonly" style="margin-top:16px">
       <label for="ballNum">최대 공 개수</label>
       <input type="number" id="ballNum" min="1" step="10" value="120">
       <button class="mini" id="ballInf">무한</button>
     </div>
-    <div class="presets">
+    <div class="presets simonly">
       <button data-ball="30">30개</button>
       <button data-ball="120">기본 120개</button>
       <button data-ball="500">500개</button>
@@ -212,6 +294,7 @@ h1 span{color:var(--hi)}
     병사 체력과 크기는 모든 팀에 똑같이 곱해진다. 상점 병사도 자기 배율만큼 같이 커지고 단단해진다. 크게 만들면 그만큼 느려진다.<br>
     같은 팀을 여러 번 고르면 그 수만큼 공이 따로 떨어지고 상점 게이지도 따로 쌓인다. 색은 조금씩 다르게 나뉘어 구분된다.<br>
     WEAPON 무기: 팀마다 <b>전부</b>(칸마다 다른 무기)와 <b>무기 하나만</b> 중에 고른다. 하나로 고정하면 공이 어느 칸에 떨어져도 그 무기만 나오고, 보드에도 그 무기가 모든 칸에 표시된다. 베이스 포탑도 고정한 무기를 따라간다.<br>
+    무기 무게: 근접 무기를 든 병사가 원거리보다 빠르다. 같은 종류 안에서도 순위가 있어서, 단검·나이프가 가장 빠르고 망치·융성망 킥이 가장 느리다. 원거리는 권총·산탄총이 빠르고 핵·대포가 가장 느리다. 아래 돌진 속도에 곱해진다.<br>
     돌진 속도: 팀마다 적에게 다가가는 빠르기를 0.2~3배로 정한다. 가속과 최고 속도가 같이 바뀌고 걷는 동작도 따라간다. 느리게 두면 원거리 팀은 거리를 유지하고, 빠르게 두면 근접 팀이 포화를 뚫고 붙는다. 무마찰 돌격 같은 기술 배율은 여기에 곱해진다.<br>
     전투력은 팀 목록에서 하나씩 조절한다. 그 팀이 뽑는 모든 병사의 공격력에 곱해지고 (0.2~5배), 체력은 위의 공용 막대가 담당한다.<br>
     도전 모드: 무기도 상점도 없고 베이스가 부서지지 않는 표적이다. 반격도 안 한다. 상대편 화력이 얼마나 나오는지 누적 피해와 초당 피해로 보여준다. 순수한 측정을 위해 격전 배율은 꺼진다.<br>
@@ -226,7 +309,8 @@ h1 span{color:var(--hi)}
     <b>SPLIT</b> — 공이 두 개로 갈라져 다시 입구로 들어간다. 많이 맞을수록 병력 생산이 빨라진다.<br>
     <b>WEAPON</b> — 아래 무기 보드로 넘어가고, 바닥 선에 닿은 무기를 든 병사가 나온다.<br>
     <b>SHOP</b> — 상점 보드로 넘어간다. 칸마다 필요한 개수가 다르고, 다 채워야 강한 병사가 나온다. 필요 개수가 클수록 강하다.<br>
-    <b>베이스</b> — 적이 다가오면 꼭대기에서 알아서 쏜다. 베이스 체력이 0이 되면 점령.
+    <b>베이스</b> — 적이 다가오면 꼭대기에서 알아서 쏜다. 베이스 체력이 0이 되면 점령.<br>
+    <b>고용 탭</b> — 공 대신 코인을 쓴다. 한 진영에 팀 하나, 옆 패널의 버튼으로 직접 사거나 AI에게 맡긴다. 사람끼리면 PvP, 한쪽만 사람이면 PvE, 둘 다 AI면 EvE다.
   </div>
 </div></div>
 
@@ -247,6 +331,7 @@ h1 span{color:var(--hi)}
   </div>
   <div id="stage">
     <div id="plinkoBox"><canvas id="plinko" width="340" height="700"></canvas></div>
+    <div id="hireBox"></div>
     <div id="fieldBox">
       <canvas id="field"></canvas>
       <canvas id="mini" width="940" height="192"></canvas>
@@ -267,10 +352,22 @@ function wp(id, name, type, dmg, range, cd, shape, o) {
   o = o || {};
   WEAPONS[id] = { id, name, type, dmg, range, cd, shape,
     col: o.col || '#dfe6ee', ps: o.ps || 460, arc: !!o.arc, aoe: o.aoe || 0, kn: o.kn || 1,
-    cry: o.cry || null, sp: o.sp || null, immune: o.immune || null, dash: o.dash || 0 };
+    cry: o.cry || null, sp: o.sp || null, immune: o.immune || null, dash: o.dash || 0,
+    mv: o.mv || 0, kills: o.kills || 0, bdmg: o.bdmg || 0 };
 }
 
 /* --- 근접 --- */
+wp('lance','기병창','m',34,66,1.05,'pole',{col:'#d8c48a',kn:1.6,dash:1.9,mv:1.6});
+/* 융성망 */
+wp('ys500kick','융성망500t킥','m',150,74,1.25,'pole',{col:'#ff5a3c',kn:3.4,cry:'융성망 500t 킥!!'});
+wp('ys250punch','융성망250t펀치','m',82,50,.55,'club',{col:'#ff8a4a',kn:2.2});
+wp('ysl6','L6 형만믿어!!!','m',9999,150,9,'blade',{col:'#ffd24a',sp:'lkill',kills:6,bdmg:320,cry:'L6 형만믿어!!!',mv:1.15});
+wp('ysslam','65kg 내려찍기!!','m',130,70,5,'club',{col:'#9ae8ff',sp:'slam',aoe:200,kn:4.5,bdmg:300,cry:'65kg 내려찍기!!',mv:1.2});
+wp('yscharge','융성망융성망 외치기 돌진','m',75,60,6,'pole',{col:'#ff4a7a',sp:'yscharge',kn:2.8,cry:'융성망 융성망!!',mv:1.5});
+wp('ys1000kick','융성망1000t킥','m',300,84,1.3,'pole',{col:'#ff2a1c',kn:5,cry:'융성망 1000t 킥!!!'});
+wp('ysl12','L12 형만믿어!!!','m',9999,210,8,'blade',{col:'#ffe8a8',sp:'lkill',kills:12,bdmg:700,cry:'L12 형만믿어!!!',mv:1.15});
+wp('ysslam2','130kg 내려찍기!!!','m',250,92,4.5,'club',{col:'#7fd8ff',sp:'slam',aoe:310,kn:6.5,bdmg:620,cry:'130kg 내려찍기!!!',mv:1.2});
+wp('ysfinal','융성망 그 자체','m',430,96,1.5,'club',{col:'#ff2a6a',kn:7,cry:'융성망!!!',mv:1.35});
 wp('sword','검','m',22,46,.9,'blade',{col:'#cfd6dd'});
 wp('greatsword','대검','m',44,58,1.5,'blade',{col:'#e2e8ee',kn:2.2});
 wp('katana','카타나','m',26,50,.8,'blade',{col:'#e8eef4'});
@@ -467,6 +564,54 @@ for (const id in WEAPONS) {
    상점병사 = [이름, 필요개수, 무기, 체력배, 공격배, 크기배]
    ============================================================ */
 const TEAMS = [];
+/* 무기 무게에 따라 이동 속도를 매긴다.
+   근접은 빠르고 원거리는 느리다. 같은 종류 안에서도 순위가 생기도록
+   최대·최소가 아니라 '순위'로 나눈다 (핵처럼 튀는 값에 끌려가지 않게). */
+(function rankMove() {
+  const all = Object.keys(WEAPONS).map(k => WEAPONS[k]);
+  const put = (arr, hi, lo, weigh) => {
+    arr.sort((a, b) => weigh(a) - weigh(b));          // 가벼운 것부터
+    arr.forEach((w, i) => { w.mv = hi - (hi - lo) * (arr.length > 1 ? i / (arr.length - 1) : 0); });
+  };
+  // 근접: 대미지가 크고 휘두르는 틈이 길수록 무겁다
+  put(all.filter(w => w.type === 'm' && !w.mv), 1.5, 1.05, w => Math.min(w.dmg, 300) * .6 + w.cd * 90);
+  // 원거리: 사거리가 길수록 자리를 잡고 쏜다
+  put(all.filter(w => w.type !== 'm' && !w.mv), .95, .5,  w => w.range + Math.min(w.cd, 8) * 30);
+})();
+
+/* 고용 값 — 코인 하나가 공 하나다.
+   WEAPON 병사는 싸고, SHOP 병사는 플링코에서 필요한 공 개수를 그대로 쓴다.
+   무기가 무거울수록(= 느릴수록) 비싸고, 같은 급이면 원거리가 더 비싸다. */
+function wPower(w) {                                       // 대충 센 정도
+  let p = Math.min(w.dmg, 420) / Math.max(.25, w.cd);      // 초당 피해
+  if (w.aoe) p *= 1 + Math.min(w.aoe, 420) / 240;          // 범위기는 여럿을 친다
+  if (w.sp === 'lkill') p *= 5;                            // 즉사기
+  else if (w.sp === 'yscharge') p *= 5;                    // 지나가는 적을 다 친다
+  else if (w.sp === 'slam' || w.sp === 'rush') p *= 2.6;
+  else if (w.sp) p *= 1.6;
+  if (w.range > 300) p *= 1.15;
+  return p;
+}
+const WRANK = {};                                          // 위력 순위 (0~1)
+(function rankPower() {
+  for (const ty of ['m', 'r']) {
+    const a = Object.keys(WEAPONS).map(k => WEAPONS[k])
+                    .filter(w => (w.type === 'm') === (ty === 'm'));
+    a.sort((x, y) => wPower(x) - wPower(y));
+    a.forEach((w, i) => { WRANK[w.id] = a.length > 1 ? i / (a.length - 1) : 0; });
+  }
+})();
+function wPrice(w) {
+  if (!w) return 1;
+  const r = w.type !== 'm';
+  // 셀수록 비싸고, 같은 급이면 원거리가 더 비싸다
+  return clamp(Math.round((r ? 2 : 1) + (WRANK[w.id] || 0) * 4), 1, 6);
+}
+function uPrice(u) {
+  const w = WEAPONS[u.w];
+  return Math.max(3, Math.round(u.cost * (w && w.type !== 'm' ? 1.3 : 1)));
+}
+
 function T(name, col, style, basics, shop) {
   TEAMS.push({ name, col, style, basics,
     shop: shop.map(s => ({ name: s[0], cost: s[1], w: s[2], hp: s[3], dmg: s[4], size: s[5] })) });
@@ -475,7 +620,7 @@ function T(name, col, style, basics, shop) {
 T('현대 군대','#4a7c3f','armor',['rifle','pistol','shotgun','knife','grenade'],
   [['중기관총병',8,'mg',1.8,1.5,1.15],['저격수',12,'sniper',1.2,3,1],['로켓병',18,'rpg',2,2.5,1.2],['전차병',28,'cannon',5,3,1.85]]);
 T('중세 군대','#8a6b3a','armor',['sword','spear','bow','axe','dagger'],
-  [['석궁병',7,'crossbow',1.2,1.6,1],['기사',11,'greatsword',2.5,1.8,1.3],['미늘창병',16,'halberd',2.2,2.2,1.25],['성기사',27,'holyspear',5,3,1.75]]);
+  [['기병',3,'lance',1.5,1.4,1.15],['석궁병',7,'crossbow',1.2,1.6,1],['기사',11,'greatsword',2.5,1.8,1.3],['미늘창병',16,'halberd',2.2,2.2,1.25],['성기사',27,'holyspear',5,3,1.75]]);
 T('베놈','#3a2b4d','blob',['claw','tentacle','websh','bite','acidspit'],
   [['심비오트',8,'shadowclaw',2,1.8,1.2],['독액포',13,'acidspit',1.6,2.4,1.1],['거대촉수',20,'tentacle',3.2,2.4,1.5],['베놈킹',30,'shadowclaw',6,3.2,2.05]]);
 T('알 증식','#d9c47a','insect',['bite','sting','eggthrow','claw','pincer'],
@@ -545,6 +690,8 @@ T('미슐랭 쿸','#e0b040','chef',['panSmash','tableware','mheal','panThrow','s
   [['바닥 끓이기',4,'boilfloor',2.6,1,1.4],['후라이팬돌진',4,'panDash',3,1,1.4],
    ['라따뚜이',5,'ratatouille',3,1,1.5],['미슐랭쓰리스타',7,'mstar',3.4,1,1.7]]);
 
+T('융성망','#ff3a5a','ys',['ys500kick','ys250punch','ysl6','ysslam','yscharge'],
+  [['융성망1000t킥',9,'ys1000kick',2.6,2.2,1.45],['L12 형만믿어!!!',16,'ysl12',3,2,1.3],['130kg 내려찍기!!!',22,'ysslam2',4,2.6,1.7],['융성망 그 자체',30,'ysfinal',7,3.4,2.2]]);
 T('도전 모드','#6c7684','stick',[],[]);
 // 무기도 상점도 없고 베이스가 부서지지 않는다. 얼마나 때릴 수 있는지 재보는 표적.
 TEAMS.find(t => t.name === '도전 모드').invincible = true;
@@ -581,12 +728,16 @@ const G = {
   rage: 1, cordyN: [0, 0], shock: [], flash: 0, holes: [], rush: [0, 0], ooze: [0, 0], sciSide: [false, false], deliv: [], zones: [],
   wlock: [[], []],             // [진영][팀] = -1이면 전부, 아니면 그 무기 하나만
   rspd: [[], []],              // [진영][팀] 돌진 속도 배율
+  coin: [0, 0], incT: 0, aiT: [0, 0], earn: [0, 0],   // 고용 모드
   cam: { x: 700, s: 1 }
 };
 const GRAV_B = 560, GRAV_W = 900;
 let MAX_BALL = 120, MAX_BALL_SIDE = 120;   // 팀 하나당 / 진영 전체 공 상한 (셋업에서 조절)
 let MAX_SOLD = 130;                        // 진영당 병사 상한 (셋업에서 조절)
 let USE_SHOP = true;                       // 이 매치에 SHOP 보드를 쓸지 (셋업에서 조절)
+let MODE = 'sim';                          // 'sim' = 시뮬레이션, 'hire' = 고용
+let COIN_START = 10, COIN_EVERY = 10, KILL_W = .67;
+let CTRL = ['human', 'ai'];                // 진영별 조종
 const MAX_CORP = 55;
 let SPAWN_EVERY = 7;   // 셋업에서 조절
 let NUKE_HP = 0;       // 이 체력 이하로 떨어지면 베이스가 적 병사를 전멸시킨다 (0 = 끔)
@@ -759,7 +910,7 @@ function resolveSlot(team, ti, reg, idx, x, y) {
     G.shopCount[team][ti][idx]++;
     if (G.shopCount[team][ti][idx] >= u.cost) {
       G.shopCount[team][ti][idx] = 0;
-      spawnSoldier(team, ti, WEAPONS[u.w], u.hp, u.dmg, u.size, u.name);
+      spawnSoldier(team, ti, WEAPONS[u.w], u.hp, u.dmg, u.size, u.name, undefined, uPrice(u));
       popText(x, y, '★ ' + u.name, '#ffd76a');
     } else popText(x, y, (u.cost - G.shopCount[team][ti][idx]) + ' 남음', '#8b96a5');
   }
@@ -773,7 +924,7 @@ const BASE = [
   { x: WORLD_W - 240, w: 108, h: 152, hp: 2000, max: 2000, cool: 0, turret: null, nuked: false, dark: 5, hole: 12 }
 ];
 
-function spawnSoldier(team, ti, w, hpMul, dmgMul, size, label, atX) {
+function spawnSoldier(team, ti, w, hpMul, dmgMul, size, label, atX, price) {
   if (G.over) return;
   let n = 0; for (const s of G.sold) if (s.team === team) n++;
   if (n >= MAX_SOLD) return;
@@ -789,8 +940,9 @@ function spawnSoldier(team, ti, w, hpMul, dmgMul, size, label, atX) {
     size, hp: SOLDIER_HP * hpMul, max: SOLDIER_HP * hpMul, dmg: dmgMul,
     cool: rnd(0, w.cd), think: rnd(0, .3), tgt: null,
     ph: Math.random() * 6.28, swing: 0, hurt: 0, cordy: -1, cordyTi: 0,
+    chg: 0, chgHit: 0, chgB: 0, slam: 0, slamX: 0, price: price || wPrice(w),
     sm,                                                  // 팀별 돌진 속도 배율
-    spd: (58 + rnd(-6, 6)) / (0.72 + 0.28 * size) * sm
+    spd: (58 + rnd(-6, 6)) / (0.72 + 0.28 * size) * sm * (w.mv || 1)
   };
   G.sold.push(made);
   return made;
@@ -909,6 +1061,70 @@ function pickTarget(s) {
   s.tgt = (best && bd < 780) ? best : null;
 }
 
+// L6 / L12 형만믿어 — 가장 가까운 적을 그 수만큼 끝낸다
+function lKill(s) {
+  const n = s.w.kills || 6, R = s.w.range * 4;
+  const foes = [];
+  for (const o of G.sold) {
+    if (o.team === s.team || o.hp <= 0) continue;
+    const d = Math.abs(o.x - s.x);
+    if (d < R) foes.push([d, o]);
+  }
+  foes.sort((a, b) => a[0] - b[0]);
+  const hit = foes.slice(0, n);
+  for (const [, o] of hit) {
+    for (let k = 0; k < 6; k++)
+      G.part.push({ x: o.x, y: o.y - 30 * o.size, vx: rnd(-200, 200), vy: rnd(-260, -20),
+                    life: .6, col: k % 2 ? '#ffd24a' : '#fff0c0', sz: rnd(2, 4) });
+    damage(o, o.hp + 1, (o.x > s.x ? 1 : -1) * 260, -300);
+  }
+  G.flash = Math.max(G.flash, .25);
+  return hit.length;
+}
+
+// 내려찍기 — 위로 뛰었다가 적이 가장 몰린 곳 한가운데로 떨어진다
+function slamJump(s, fallbackX) {
+  let bx = null, best = -1;
+  for (const o of G.sold) {
+    if (o.team === s.team || o.hp <= 0) continue;
+    let n = 0;
+    for (const p of G.sold) if (p.team !== s.team && p.hp > 0 && Math.abs(p.x - o.x) < 150) n++;
+    if (n > best) { best = n; bx = o.x; }
+  }
+  if (bx === null) bx = (fallbackX === undefined ? null : fallbackX);
+  if (bx === null) return false;
+  s.vy = -620; s.ground = false;
+  s.slamX = clamp(bx, 80, WORLD_W - 80);
+  s.slam = 1;
+  return true;
+}
+
+function slamLand(s) {
+  const w = s.w, R = w.aoe || 200;
+  G.shock.push({ x: s.x, y: GROUND, r: 10, max: R, life: .45 });
+  G.flash = Math.max(G.flash, .2);
+  const k0 = Math.floor((s.x - R) / BK), k1 = Math.floor((s.x + R) / BK);
+  for (let k = k0; k <= k1; k++) {
+    const a = BKT.get(k); if (!a) continue;
+    for (const o of a) {
+      if (o.team === s.team || o.hp <= 0) continue;
+      const d = Math.abs(o.x - s.x); if (d > R) continue;
+      const f = 1 - d / R;
+      damage(o, w.dmg * s.dmg * G.rage * f, (o.x > s.x ? 1 : -1) * w.kn * 90 * f, -260 * f);
+    }
+  }
+  const eb = BASE[1 - s.team];                       // 베이스도 범위에 들면 같이 맞는다
+  const bd = Math.abs(s.x - eb.x) - eb.w / 2;
+  if (bd < R) {
+    const dv = (w.bdmg || w.dmg) * s.dmg * G.rage * (1 - Math.max(0, bd) / R);
+    eb.hp -= dv;
+    dmgNum(eb.x + (s.team === 0 ? -eb.w / 2 : eb.w / 2), GROUND - eb.h * .6, dv, '#ff9a5a');
+  }
+  for (let i = 0; i < 24; i++)
+    G.part.push({ x: s.x + rnd(-R * .5, R * .5), y: GROUND, vx: rnd(-320, 320), vy: rnd(-380, -40),
+                  life: .7, col: i % 2 ? '#9ae8ff' : '#dfe6ee', sz: rnd(2, 4.5) });
+}
+
 function say(s, txt, col) {
   G.nums.push({ x: s.x, y: s.y - 86 * s.size, vx: 0, vy: -22,
                 v: txt, col: col || '#9ae8ff', big: true, life: 2.2 });
@@ -930,6 +1146,14 @@ function damage(s, amount, kx, ky) {
                   life: .5, col: '#e0503c', sz: rnd(1.5, 3.2) });
   if (s.hp <= 0) {
     G.kills[1 - s.team]++;                 // 죽인 쪽에 한 명 적립
+    if (MODE === 'hire' && KILL_W > 0) {   // 잡은 병사 값 × W 만큼 코인
+      const g = Math.round((s.price || 1) * KILL_W);
+      if (g > 0) {
+        G.coin[1 - s.team] += g; G.earn[1 - s.team] += g;
+        G.nums.push({ x: s.x, y: s.y - 70 * s.size, vx: 0, vy: -34,
+                      v: '+' + g + '코인', col: '#ffd76a', big: true, life: 1.3 });
+      }
+    }
     // 살아 있을 때는 안 밀리지만, 죽는 순간만은 랙돌이 날아가게 최소 충격을 준다
     const dx = kx || -s.face * 210, dy = ky || -250;
     makeCorpse(s, dx, dy);
@@ -1005,7 +1229,34 @@ function stepBattle(dt) {
     const dir = tx > s.x ? 1 : -1;
     s.face = dir;
     s.moving = false;
-    const rush = (G.rush[s.team] > 0 ? 3 : 1) * (s.w.dash || (s.w.id === 'marchcook' ? 2.1 : 1));
+    let rush = (G.rush[s.team] > 0 ? 3 : 1) * (s.w.dash || (s.w.id === 'marchcook' ? 2.1 : 1));
+    if (s.chg > 0) {                                 // 융성망 외치기 돌진
+      s.chg -= dt; rush *= 3.4;
+      const k0 = Math.floor((s.x - 46) / BK), k1 = Math.floor((s.x + 46) / BK);
+      for (let k = k0; k <= k1; k++) {
+        const a = BKT.get(k); if (!a) continue;
+        for (const o of a) {
+          if (o.team === s.team || o.hp <= 0 || Math.abs(o.x - s.x) > 46) continue;
+          if (o.chgHit > 0) continue;                // 한 번 지나갈 때 한 번만
+          o.chgHit = .5;
+          damage(o, s.w.dmg * s.dmg * G.rage, (o.x > s.x ? 1 : -1) * s.w.kn * 70, -190);
+        }
+      }
+      // 베이스에 부딪혀도 들이받는다 — 안 그러면 돌진이 베이스 앞에서 헛돈다
+      const cb = BASE[1 - s.team];
+      if (Math.abs(s.x - cb.x) < cb.w / 2 + 44) {
+        if (!(s.chgB > 0)) {
+          s.chgB = .45;
+          const dv = s.w.dmg * s.dmg * G.rage;
+          cb.hp -= dv;
+          dmgNum(cb.x + (s.team === 0 ? -cb.w / 2 : cb.w / 2), GROUND - cb.h * .6, dv, '#ff9a5a');
+        }
+      }
+      G.part.push({ x: s.x, y: s.y - 20 * s.size, vx: rnd(-40, 40), vy: rnd(-60, 10),
+                    life: .35, col: '#ff4a7a', sz: 2.4 });
+    }
+    if (s.chgHit > 0) s.chgHit -= dt;
+    if (s.chgB > 0) s.chgB -= dt;
     const sm = s.sm || 1;
     if (dist > want) { s.vx += dir * s.spd * 8 * rush * dt; s.ph += dt * 10 * rush * sm; s.moving = true; }
     else if (dist < KITE_DIST && s.w.type === 'r' && !isBase) { s.vx -= dir * s.spd * 2 * dt; s.ph += dt * 8 * sm; s.moving = true; }
@@ -1026,7 +1277,16 @@ function stepBattle(dt) {
           s.cool = s.w.cd; s.swing = 1;
           say(s, s.w.cry, '#ff9ad0');
           G.deliv.push({ x: s.x, y: s.y - 42 * s.size, tgt: hurt, heal: 75 * s.dmg, life: 5 });
-        } else s.cool = .7;
+        } else {
+          // 고칠 아군이 없을 때 가만히 서 있으면 전진이 영영 멈춘다. 베이스라도 두드린다.
+          const hb = BASE[1 - s.team];
+          if (hb.hp > 0 && Math.abs(s.x - hb.x) < hb.w / 2 + s.w.range * .9) {
+            s.cool = s.w.cd; s.swing = 1;
+            const dv = 14 * s.dmg * G.rage;
+            hb.hp -= dv;
+            dmgNum(hb.x + (s.team === 0 ? -hb.w / 2 : hb.w / 2), GROUND - hb.h * .6, dv, '#ff9a5a');
+          } else s.cool = .7;
+        }
       }
       s.vy += GRAV_W * dt; s.x += s.vx * dt; s.y += s.vy * dt;
       if (s.y >= GROUND) { s.y = GROUND; s.vy = 0; s.ground = true; } else s.ground = false;
@@ -1038,7 +1298,28 @@ function stepBattle(dt) {
     const pinned = s.w.type === 'r' && !isBase && dist < RANGED_MIN;
     if (dist <= s.w.range && s.cool <= 0 && !pinned) {
       s.cool = s.w.cd * rnd(.9, 1.1); s.swing = 1;
-      if (s.w.type === 'm') {
+      // 특수기는 적 병사만 노리게 돼 있었다. 베이스 앞에 서면 아무것도 못 하고 멈춰 있었다.
+      const bangBase = dv => {
+        eb.hp -= dv;
+        dmgNum(eb.x + (s.team === 0 ? -eb.w / 2 : eb.w / 2), GROUND - eb.h * .6, dv, '#ff9a5a');
+      };
+      if (s.w.type === 'm' && s.w.sp === 'lkill') {
+        say(s, s.w.cry, '#ffd24a');
+        const got = lKill(s);
+        if (isBase) bangBase((s.w.bdmg || 150) * s.dmg * G.rage);   // 베이스는 즉사하지 않는다
+        else if (!got) s.cool = .6;                  // 아무도 없으면 금방 다시 외친다
+      } else if (s.w.type === 'm' && s.w.sp === 'slam') {
+        say(s, s.w.cry, '#9ae8ff');
+        // 적이 없으면 베이스 앞으로 뛰어내린다
+        const bx = eb.x + (s.team === 0 ? -eb.w / 2 - 30 : eb.w / 2 + 30);
+        if (!slamJump(s, bx)) s.cool = .6;
+      } else if (s.w.type === 'm' && s.w.sp === 'yscharge') {
+        say(s, s.w.cry, '#ff8ab0');                  // 외치면서 멀리까지 질주한다
+        s.chg = 2.6;
+        for (let k = 0; k < 10; k++)
+          G.part.push({ x: s.x, y: s.y - 24 * s.size, vx: rnd(-200, 200), vy: rnd(-240, -20),
+                        life: .5, col: '#ff4a7a', sz: rnd(2, 4) });
+      } else if (s.w.type === 'm') {
         if (s.w.cry) say(s, s.w.cry, '#9ae8ff');
         const kn = s.w.kn * MELEE_KNOCK;
         if (isBase) { const dv = s.w.dmg * s.dmg * G.rage; eb.hp -= dv;
@@ -1051,6 +1332,11 @@ function stepBattle(dt) {
         // 마찰이 없다면 가속은 멈추지 않는다 — 팀 전체가 한동안 폭주한다
         G.rush[s.team] = Math.max(G.rush[s.team], 4);
         say(s, s.w.cry, '#9ae8ff');
+        if (isBase) {                                  // 베이스 앞이면 그대로 들이받는다
+          const dv = 26 * s.dmg * G.rage;
+          eb.hp -= dv;
+          dmgNum(eb.x + (s.team === 0 ? -eb.w / 2 : eb.w / 2), GROUND - eb.h * .6, dv, '#ff9a5a');
+        }
         for (const o of G.sold) if (o.team === s.team)
           for (let k = 0; k < 4; k++)
             G.part.push({ x: o.x, y: o.y - 20 * o.size, vx: rnd(-120, 120), vy: rnd(-140, -10),
@@ -1088,8 +1374,16 @@ function stepBattle(dt) {
     }
 
     s.vy += GRAV_W * dt;
+    if (s.slam) {                                     // 목표 지점 한가운데로 날아간다
+      const togo = s.slamX - s.x;
+      s.vx = clamp(togo * 2.2, -900, 900);
+      s.face = togo > 0 ? 1 : -1;
+    }
     s.x += s.vx * dt; s.y += s.vy * dt;
-    if (s.y >= GROUND) { s.y = GROUND; s.vy = 0; s.ground = true; } else s.ground = false;
+    if (s.y >= GROUND) {
+      s.y = GROUND; s.vy = 0; s.ground = true;
+      if (s.slam) { s.slam = 0; s.vx = 0; slamLand(s); }
+    } else s.ground = false;
     s.x = clamp(s.x, 60, WORLD_W - 60);
   }
   for (let i = G.sold.length - 1; i >= 0; i--) if (G.sold[i].hp <= 0) G.sold.splice(i, 1);
@@ -1215,6 +1509,15 @@ function stepBattle(dt) {
             const d = Math.hypot(s.x - p.x, (s.y - 26 * s.size) - p.y);
             if (d < p.aoe) damage(s, p.dmg * (1 - d / p.aoe) * .85,
                                   Math.sign(s.x - p.x || 1) * AOE_KNOCK * p.w.kn, -AOE_KNOCK * p.w.kn);
+          }
+        }
+        // 큰 폭발은 베이스도 휩쓴다. 예전엔 병사만 쳐서, 핵이 베이스 옆에 떨어져도 베이스가 멀쩡했다.
+        if (!inBase && eb.hp > 0) {
+          const bd = Math.max(0, Math.abs(p.x - eb.x) - eb.w / 2);
+          if (bd < p.aoe) {
+            const dv = p.dmg * (1 - bd / p.aoe) * .85;
+            eb.hp -= dv;
+            dmgNum(eb.x + (p.team === 0 ? -eb.w / 2 : eb.w / 2), GROUND - eb.h * .6, dv, '#ff9a5a');
           }
         }
         for (let k = 0; k < 16; k++)
@@ -1577,6 +1880,17 @@ function drawSoldier(ctx, s) {
   }
   else if (s.style === 'robot') { ctx.fillRect(x - hr, headY - bob - hr, hr * 2, hr * 2); ctx.fillStyle = acc; ctx.fillRect(x - hr * .6, headY - bob - hr * .3, hr * 1.2, hr * .5); }
   else { ctx.beginPath(); ctx.arc(x, headY - bob, hr, 0, 6.3); ctx.fill(); }
+  if (s.style === 'ys') {                          // 위로 쭉 솟은 머리 ||||||||||||
+    ctx.strokeStyle = body; ctx.lineWidth = Math.max(.9, 1.5 * S);
+    ctx.lineCap = 'butt';
+    const N = 12, half = hr * 1.35, top = headY - bob - hr * .5;
+    for (let i = 0; i < N; i++) {
+      const hx = x - half + (i / (N - 1)) * half * 2;
+      const hh = hr * (2.1 + .45 * Math.sin(i * 2.1) + .25 * Math.sin(i * .7));
+      ctx.beginPath(); ctx.moveTo(hx, top); ctx.lineTo(hx, top - hh); ctx.stroke();
+    }
+    ctx.lineCap = 'round';
+  }
   if (s.style === 'demon') {
     ctx.fillStyle = acc;
     for (const k of [-1, 1]) { ctx.beginPath(); ctx.moveTo(x + k * hr * .7, headY - bob - hr * .6); ctx.lineTo(x + k * hr * 1.7, headY - bob - hr * 2.1); ctx.lineTo(x + k * hr * .2, headY - bob - hr * 1.1); ctx.fill(); }
@@ -2139,7 +2453,9 @@ function buildGrid(side) {
     d.className = 'tcard';
     d.innerHTML = '<b>' + t.name + '</b><i>' + (t.shop[3] ? t.shop[3].name : '표적') + '</i>';
     d.onclick = e => {                       // 클릭 = 하나 추가, Shift+클릭 = 하나 빼기
-      if (e.shiftKey) dropOne(si, i); else sel[si].push({ i, pow: 1, wp: -1, spd: 1 });
+      if (e.shiftKey) dropOne(si, i);
+      else if (MODE === 'hire') sel[si] = [{ i, pow: 1, wp: -1, spd: 1 }];   // 고용은 한 팀만
+      else sel[si].push({ i, pow: 1, wp: -1, spd: 1 });
       refresh(side);
     };
     d.oncontextmenu = e => {                 // 우클릭 = 하나 빼기
@@ -2178,6 +2494,15 @@ function refresh(side) {
   const seen = new Map();
   const list = document.createElement('div');
   list.className = 'plist';
+    if (MODE === 'hire') {
+      const pv = document.createElement('div');
+      pv.style.cssText = 'font-size:10.5px;color:var(--dim);margin-bottom:5px;line-height:1.5';
+      const T0 = TEAMS[sel[si][0].i];
+      pv.innerHTML = '값 — ' +
+        T0.basics.map(id => WEAPONS[id].name + ' ' + wPrice(WEAPONS[id])).join(' · ') +
+        (T0.shop.length ? '<br>★ ' + T0.shop.map(u => u.name + ' ' + uPrice(u)).join(' · ') : '');
+      det.appendChild(pv);
+    }
 
   sel[si].forEach((e, k) => {
     const t = TEAMS[e.i];
@@ -2187,8 +2512,12 @@ function refresh(side) {
     row.title = t.name + ' — ' + t.basics.map(b => WEAPONS[b].name).join(', ') +
                 ' / 상점 ' + t.shop.map(u => u.name + '(★' + u.cost + ')').join(', ');
 
-    const dot = document.createElement('span');
-    dot.className = 'pdot'; dot.style.background = tintCol(base, k, n);
+    const auto = tintCol(base, k, n);
+    const dot = document.createElement('input');     // 눌러서 이 팀 스틱맨 색을 바꾼다
+    dot.type = 'color'; dot.className = 'pdot';
+    dot.value = e.col || auto;
+    dot.title = t.name + ' 색 — 누르면 바꾼다';
+    dot.oninput = () => { e.col = dot.value; };
 
     const nm = document.createElement('span');
     nm.className = 'pname';
@@ -2288,6 +2617,10 @@ function refresh(side) {
     bt.onclick = () => { sel[si].forEach(e => e.spd = v); refresh(side); };
     sbulk.appendChild(bt);
   }
+  const auto2 = document.createElement('button');
+  auto2.textContent = '색 자동으로';
+  auto2.onclick = () => { sel[si].forEach(e => delete e.col); refresh(side); };
+  sbulk.appendChild(auto2);
   det.appendChild(sbulk);
 
   const sum = document.createElement('div');
@@ -2296,8 +2629,49 @@ function refresh(side) {
   det.appendChild(sum);
   const btn = document.getElementById('startBtn');
   btn.disabled = !sel[0].length || !sel[1].length;
-  btn.textContent = btn.disabled ? '양쪽 진영에서 팀을 고르세요' : '전투 시작 (' + sel[0].length + '팀 vs ' + sel[1].length + '팀)';
+  btn.textContent = btn.disabled ? '양쪽 진영에서 팀을 고르세요'
+    : MODE === 'hire'
+      ? '고용 시작 (' + (CTRL[0] === 'human' ? '사람' : 'AI') + ' vs ' + (CTRL[1] === 'human' ? '사람' : 'AI') + ')'
+      : '전투 시작 (' + sel[0].length + '팀 vs ' + sel[1].length + '팀)';
 }
+// ── 탭 ──
+const ctlA = document.getElementById('ctlA'), ctlB = document.getElementById('ctlB');
+function syncCtl() {
+  [[ctlA, 0], [ctlB, 1]].forEach(([b, t]) => {
+    b.classList.toggle('on', CTRL[t] === 'human');
+    b.textContent = CTRL[t] === 'human' ? '사람' : 'AI';
+  });
+  refresh('A');
+}
+ctlA.onclick = () => { CTRL[0] = CTRL[0] === 'human' ? 'ai' : 'human'; syncCtl(); };
+ctlB.onclick = () => { CTRL[1] = CTRL[1] === 'human' ? 'ai' : 'human'; syncCtl(); };
+document.querySelectorAll('[data-ctl]').forEach(b => b.onclick = () => {
+  const m = b.dataset.ctl;
+  CTRL = m === 'pvp' ? ['human', 'human'] : m === 'eve' ? ['ai', 'ai'] : ['human', 'ai'];
+  syncCtl();
+});
+
+function setMode(m) {
+  MODE = m;
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  document.getElementById('hireOpts').style.display = m === 'hire' ? 'block' : 'none';
+  document.querySelectorAll('.simonly').forEach(e => e.style.display = m === 'hire' ? 'none' : '');
+  document.getElementById('subTxt').textContent = m === 'hire'
+    ? '코인으로 병사를 산다. 코인 하나가 공 하나다. 시간이 지나면 코인이 들어오고, 적을 잡아도 들어온다.'
+    : '7초마다 양 팀의 공이 하나씩 떨어진다. 공이 어느 칸에 빠지느냐가 병력을 결정하고, 병력이 상대 베이스를 부수면 이긴다.';
+  if (m === 'hire') for (const si of [0, 1]) if (sel[si].length > 1) sel[si] = [sel[si][0]];
+  refresh('A'); refresh('B');
+}
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+const coinNum = document.getElementById('coinNum');
+const incRange = document.getElementById('incRange'), incVal = document.getElementById('incVal');
+const wRange = document.getElementById('wRange'), wVal = document.getElementById('wVal');
+function syncInc() { incVal.textContent = incRange.value + '초'; }
+function syncW() { wVal.textContent = (+wRange.value).toFixed(2) + '배'; }
+incRange.oninput = syncInc; wRange.oninput = syncW; syncInc(); syncW();
+syncCtl();
+
 buildGrid('A'); buildGrid('B');
 document.querySelectorAll('.mini').forEach(b => b.onclick = () => {
   const side = b.dataset.all || b.dataset.none;
@@ -2361,6 +2735,9 @@ document.querySelectorAll('.presets button').forEach(b => b.onclick = () => {
   if (b.dataset.hp) { hpRange.value = b.dataset.hp; syncHp(); }
   if (b.dataset.iv) { ivRange.value = b.dataset.iv; syncIv(); }
   if (b.dataset.nuke !== undefined) { nukeRange.value = b.dataset.nuke; syncNuke(); }
+  if (b.dataset.coin !== undefined) { coinNum.value = b.dataset.coin; }
+  if (b.dataset.inc) { incRange.value = b.dataset.inc; syncInc(); }
+  if (b.dataset.w !== undefined) { wRange.value = b.dataset.w; syncW(); }
 });
 
 /* ============================================================
@@ -2390,7 +2767,8 @@ function startGame() {
   G.wlock = [sel[0].map(e => wlockOf(e)), sel[1].map(e => wlockOf(e))];
   G.rspd  = [sel[0].map(e => +e.spd || 1), sel[1].map(e => +e.spd || 1)];
   G.col = [colA.value, colB.value];
-  G.tcol = [0, 1].map(t => G.roster[t].map((_, i) => tintCol(G.col[t], i, G.roster[t].length)));
+  // 팀마다 따로 정한 색이 있으면 그것을, 없으면 진영 색을 나눠 쓴다
+  G.tcol = [0, 1].map(t => sel[t].map((e, i) => e.col || tintCol(G.col[t], i, sel[t].length)));
   // 칸 수는 고른 팀들 중 가장 많은 쪽에 맞춘다. 도전 모드처럼 0개인 팀이 있어도 줄어들지 않는다.
   const all = [...G.roster[0], ...G.roster[1]];
   // SHOP을 끄면 BALL DROP은 SPLIT/WEAPON 두 칸이 되고 WEAPON 보드가 아래까지 넓어진다
@@ -2417,6 +2795,10 @@ function startGame() {
   MAX_BALL = MAX_BALL_SIDE;                  // 팀이 하나뿐이면 상한을 다 쓸 수 있게
   MAX_SOLD = capOf(soldNum, INF.sold, 130);
   SIZE_MUL = clamp(parseFloat(szRange.value) || 1, .4, 2.5);
+  COIN_START = Math.max(0, Math.floor(+coinNum.value) || 0);
+  COIN_EVERY = clamp(parseFloat(incRange.value) || 10, 1, 60);
+  KILL_W     = clamp(parseFloat(wRange.value), 0, 2);
+  G.coin = [COIN_START, COIN_START]; G.incT = 0; G.aiT = [0, 0]; G.earn = [COIN_START, COIN_START];
   G.t = 0; G.spawnT = SPAWN_EVERY; G.over = false; G.winner = -1; G.rage = 1;
   G.speed = 1; G.cam.x = WORLD_W / 2; G.cam.s = .8;
   const startHp = clamp(parseInt(hpRange.value, 10) || 2000, 300, 10000);
@@ -2435,6 +2817,9 @@ function startGame() {
     b.turret = WEAPONS[rangedId || 'bow'];
   }
   buildBoard();
+  document.getElementById('plinkoBox').style.display = MODE === 'hire' ? 'none' : '';
+  document.getElementById('hireBox').style.display   = MODE === 'hire' ? 'flex' : 'none';
+  buildHirePanel();
   document.getElementById('nmA').textContent = sideName(0);
   document.getElementById('nmB').textContent = sideName(1);
   document.getElementById('nmA').style.color = G.col[0];
@@ -2457,10 +2842,113 @@ document.querySelectorAll('.spd button').forEach(b => b.onclick = () => {
   document.querySelectorAll('.spd button').forEach(o => o.classList.toggle('on', o === b));
 });
 
+/* ============================================================
+   고용 모드 — 코인으로 병사를 산다
+   ============================================================ */
+function hireList(t) {                      // 그 진영이 살 수 있는 것들
+  const T = G.roster[t] && G.roster[t][0];
+  if (!T) return [];
+  const out = [];
+  const lock = G.wlock[t][0];
+  T.basics.forEach((id, i) => {
+    if (lock >= 0 && lock !== i) return;     // 무기를 고정했으면 그것만 판다
+    const w = WEAPONS[id];
+    if (w) out.push({ kind: 'w', name: w.name, price: wPrice(w), w, i });
+  });
+  T.shop.forEach((u, i) => {
+    const w = WEAPONS[u.w];
+    if (w) out.push({ kind: 's', name: u.name, price: uPrice(u), w, u, i });
+  });
+  return out;
+}
+
+function buy(t, it) {
+  if (G.over || !it || G.coin[t] < it.price) return false;
+  let n = 0; for (const s of G.sold) if (s.team === t) n++;
+  if (n >= MAX_SOLD) return false;
+  G.coin[t] -= it.price;
+  if (it.kind === 'w') spawnSoldier(t, 0, it.w, 1, 1, 1, it.name, undefined, it.price);
+  else spawnSoldier(t, 0, it.w, it.u.hp, it.u.dmg, it.u.size, it.u.name, undefined, it.price);
+  return true;
+}
+
+function buildHirePanel() {
+  const box = document.getElementById('hireBox');
+  box.innerHTML = '';
+  if (MODE !== 'hire') return;
+  HIRE_BTN = [[], []];
+  for (let t = 0; t < 2; t++) {
+    const T = G.roster[t][0];
+    const p = document.createElement('div');
+    p.className = 'hpanel';
+    const h = document.createElement('h4');
+    h.innerHTML = '<span class="pdot" style="background:' + G.tcol[t][0] + '"></span>' +
+                  (t === 0 ? '왼쪽 · ' : '오른쪽 · ') + T.name +
+                  '<span class="hcoin" id="coin' + t + '">0</span>';
+    const sub = document.createElement('div');
+    sub.className = 'hsub';
+    sub.textContent = CTRL[t] === 'human' ? '눌러서 병사를 산다' : 'AI가 알아서 산다';
+    p.append(h, sub);
+    if (CTRL[t] === 'human') {
+      const g = document.createElement('div');
+      g.className = 'hbtns';
+      for (const it of hireList(t)) {
+        const b = document.createElement('button');
+        if (it.kind === 's') b.className = 'shop';
+        b.innerHTML = cut(it.name, 11) + '<i>' + it.price + ' 코인</i>';
+        b.title = it.name + ' — ' + it.price + ' 코인 (' +
+                  (it.w.type === 'm' ? '근접' : '원거리') + ')';
+        b.onclick = () => buy(t, it);
+        g.appendChild(b);
+        HIRE_BTN[t].push([b, it]);
+      }
+      p.appendChild(g);
+    } else {
+      const a = document.createElement('div');
+      a.className = 'hai'; a.textContent = '자동 운영 중';
+      p.appendChild(a);
+    }
+    box.appendChild(p);
+  }
+}
+let HIRE_BTN = [[], []];
+
+function syncHirePanel() {
+  for (let t = 0; t < 2; t++) {
+    const c = document.getElementById('coin' + t);
+    if (c) c.textContent = G.coin[t] + ' 코인';
+    for (const [b, it] of HIRE_BTN[t]) b.disabled = G.coin[t] < it.price || G.over;
+  }
+}
+
+function stepHire(dt) {
+  G.incT += dt;
+  if (COIN_EVERY > 0) while (G.incT >= COIN_EVERY) {   // 일정 시간마다 코인 하나
+    G.incT -= COIN_EVERY;
+    for (let t = 0; t < 2; t++) { G.coin[t]++; G.earn[t]++; }
+  }
+  for (let t = 0; t < 2; t++) {
+    if (CTRL[t] !== 'ai') continue;
+    G.aiT[t] -= dt;
+    if (G.aiT[t] > 0) continue;
+    G.aiT[t] = rnd(.5, 1.4);
+    const list = hireList(t).filter(it => it.price <= G.coin[t]);
+    if (!list.length) continue;
+    // 아낄수록 센 걸 사지만, 수가 밀리면 싼 걸로 머릿수를 채운다
+    let mine = 0, foe = 0;
+    for (const s of G.sold) s.team === t ? mine++ : foe++;
+    const greedy = mine >= foe - 2;
+    list.sort((a, b) => greedy ? b.price - a.price : a.price - b.price);
+    const pick = list[Math.random() < .75 ? 0 : Math.floor(Math.random() * list.length)];
+    buy(t, pick);
+  }
+}
+
 function step(dt) {
   G.t += dt; G.spawnT += dt;
   G.rage = (G.invin[0] || G.invin[1]) ? 1   // 순수한 화력 측정을 위해 격전 배율은 끈다
             : Math.min(3.2, 1 + Math.max(0, G.t - 120) / 170);
+  if (MODE === 'hire') { stepHire(dt); stepBattle(dt); return; }
   if (G.spawnT >= SPAWN_EVERY) {
     G.spawnT -= SPAWN_EVERY;
     for (let t = 0; t < 2; t++)                       // 고른 팀마다 하나씩 — 나눠 갖는 게 아니라 각자 생성
@@ -2481,7 +2969,8 @@ function frame(now) {
   }
   if (G.roster[0].length && document.getElementById('game').style.display !== 'none') {
     updateCam(raw);
-    drawField(); drawMini(); drawPlinko();
+    drawField(); drawMini();
+    if (MODE === 'hire') syncHirePanel(); else drawPlinko();
     let a = 0, b = 0;
     for (const s of G.sold) s.team === 0 ? a++ : b++;
     const rg = G.rage > 1.03 ? ' · 격전 x' + G.rage.toFixed(1) : '';
@@ -2489,6 +2978,7 @@ function frame(now) {
       ? '표적 · 받은 피해 ' + Math.round(G.dealt[t]).toLocaleString() +
         ' · 초당 ' + (G.t > 1 ? Math.round(G.dealt[t] / G.t) : 0)
       : '병사 ' + cntN + ' · 처치 ' + G.kills[t] +
+        (MODE === 'hire' ? ' · 코인 ' + G.coin[t] : '') +
         ' · 베이스 ' + Math.max(0, Math.round(BASE[t].hp)) + rg;
     document.getElementById('stA').textContent = line(0, a);
     document.getElementById('stB').textContent = line(1, b);
@@ -2509,6 +2999,10 @@ function frame(now) {
         }
         sub.innerHTML = '처치 <b style="color:' + G.col[0] + '">' + G.kills[0] + '</b>' +
           ' : <b style="color:' + G.col[1] + '">' + G.kills[1] + '</b>' +
+          (MODE === 'hire'
+            ? ' · 번 코인 <b style="color:' + G.col[0] + '">' + G.earn[0] + '</b>' +
+              ' : <b style="color:' + G.col[1] + '">' + G.earn[1] + '</b>'
+            : '') +
           ' · ' + Math.round(G.t) + '초';
       }
     }
