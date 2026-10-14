@@ -353,11 +353,11 @@ function wp(id, name, type, dmg, range, cd, shape, o) {
   WEAPONS[id] = { id, name, type, dmg, range, cd, shape,
     col: o.col || '#dfe6ee', ps: o.ps || 460, arc: !!o.arc, aoe: o.aoe || 0, kn: o.kn || 1,
     cry: o.cry || null, sp: o.sp || null, immune: o.immune || null, dash: o.dash || 0,
-    mv: o.mv || 0, kills: o.kills || 0, bdmg: o.bdmg || 0 };
+    mv: o.mv || 0, kills: o.kills || 0, bdmg: o.bdmg || 0, mount: o.mount || 0 };
 }
 
 /* --- 근접 --- */
-wp('lance','기병창','m',34,66,1.05,'pole',{col:'#d8c48a',kn:1.6,dash:1.9,mv:1.6});
+wp('lance','기병창','m',34,66,1.05,'pole',{col:'#d8c48a',kn:1.6,dash:1.9,mv:1.6,mount:1});
 /* 융성망 */
 wp('ys500kick','융성망500t킥','m',150,74,1.25,'pole',{col:'#ff5a3c',kn:3.4,cry:'융성망 500t 킥!!'});
 wp('ys250punch','융성망250t펀치','m',82,50,.55,'club',{col:'#ff8a4a',kn:2.2});
@@ -1770,6 +1770,84 @@ let LOD = false;            // true면 장식 생략 (아주 큰 전투에서만
 // 기본 설정의 최대 병력(진영당 130명 = 260명)으로는 절대 켜지지 않는 값으로 올렸고,
 // 경계에서 깜빡이지 않도록 켜지는 값과 꺼지는 값을 따로 둔다.
 const LOD_ON = 420, LOD_OFF = 320;
+// 기병이 타는 말 — 병사 밑에 깔고, 기수는 안장 위로 올려 그린다
+const MOUNT_H = 17;                                  // 기수를 올리는 높이 (×size)
+function drawHorse(ctx, s) {
+  const S = s.size, f = s.face, x = s.x, y = s.y;
+  const body = s.hurt > 0 ? '#ffffff' : s.col;
+  const by = y - 30 * S, bw = 22 * S, bh = 9.5 * S;   // 몸통 중심과 크기
+  const run = s.moving ? s.ph * 1.25 : 0;
+  const sh = (c, k) => {                              // 몸통보다 어두운 색 (갈기·꼬리·굽)
+    const v = p => parseInt(c.slice(p, p + 2), 16);
+    const m = n => Math.round(n * k).toString(16).padStart(2, '0');
+    return c[0] === '#' && c.length === 7 ? '#' + m(v(1)) + m(v(3)) + m(v(5)) : c;
+  };
+  const dk = sh(body, .62);
+
+  ctx.save();
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  // 뒷다리 먼저 (몸통 뒤로 가게)
+  ctx.strokeStyle = dk; ctx.lineWidth = 4.2 * S;
+  const leg = (lx, ph, col) => {
+    ctx.strokeStyle = col;
+    const k = s.moving ? Math.sin(run + ph) : 0;
+    const kneeY = by + bh * .9 + 9 * S;
+    ctx.beginPath();
+    ctx.moveTo(x + lx, by + bh * .35);
+    ctx.lineTo(x + lx + k * 3.5 * S, kneeY);
+    ctx.lineTo(x + lx + k * 8 * S, y);
+    ctx.stroke();
+  };
+  leg(f * 13 * S, 2.4, dk); leg(-f * 15 * S, 3.6, dk);    // 먼쪽 다리
+  ctx.fillStyle = body;
+  ctx.beginPath(); ctx.ellipse(x, by, bw, bh, 0, 0, 6.3); ctx.fill();   // 몸통
+  ctx.beginPath(); ctx.ellipse(x - f * 15 * S, by + 1 * S, 8.5 * S, 9 * S, 0, 0, 6.3); ctx.fill();  // 엉덩이
+  leg(f * 17 * S, 0, body); leg(-f * 11 * S, 1.2, body);  // 가까운쪽 다리
+
+  // 목 — 어깨에서 비스듬히 올라간다
+  ctx.beginPath();
+  ctx.moveTo(x + f * 12 * S, by - bh * .9);
+  ctx.quadraticCurveTo(x + f * 25 * S, by - 15 * S, x + f * 31 * S, by - 23 * S);
+  ctx.lineTo(x + f * 38 * S, by - 19 * S);
+  ctx.quadraticCurveTo(x + f * 28 * S, by - 8 * S, x + f * 18 * S, by + bh * .2);
+  ctx.closePath(); ctx.fill();
+
+  // 머리 — 주둥이가 앞으로 나온다
+  ctx.beginPath();
+  ctx.moveTo(x + f * 30 * S, by - 26 * S);
+  ctx.lineTo(x + f * 44 * S, by - 19 * S);
+  ctx.lineTo(x + f * 44 * S, by - 14 * S);
+  ctx.lineTo(x + f * 31 * S, by - 16 * S);
+  ctx.closePath(); ctx.fill();
+
+  // 귀
+  ctx.beginPath();
+  ctx.moveTo(x + f * 30 * S, by - 26 * S);
+  ctx.lineTo(x + f * 31 * S, by - 33 * S);
+  ctx.lineTo(x + f * 35 * S, by - 25 * S);
+  ctx.closePath(); ctx.fill();
+
+  // 갈기
+  ctx.strokeStyle = dk; ctx.lineWidth = 3 * S;
+  ctx.beginPath();
+  ctx.moveTo(x + f * 31 * S, by - 25 * S);
+  ctx.quadraticCurveTo(x + f * 20 * S, by - 19 * S, x + f * 11 * S, by - bh * 1.05);
+  ctx.stroke();
+
+  // 꼬리
+  ctx.lineWidth = 3.4 * S;
+  ctx.beginPath();
+  ctx.moveTo(x - f * 21 * S, by - bh * .5);
+  ctx.quadraticCurveTo(x - f * 30 * S, by + 4 * S, x - f * 26 * S, by + 16 * S);
+  ctx.stroke();
+
+  // 눈
+  ctx.fillStyle = '#2b2431';
+  ctx.beginPath(); ctx.arc(x + f * 35 * S, by - 20 * S, 1.5 * S, 0, 6.3); ctx.fill();
+  ctx.restore();
+}
+
 function drawSoldier(ctx, s) {
   const S = s.size, f = s.face, x = s.x, y = s.y;
   const body = s.hurt > 0 ? '#ffffff' : s.col;
@@ -1780,6 +1858,8 @@ function drawSoldier(ctx, s) {
 
   ctx.save();
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  if (s.w.mount) { drawHorse(ctx, s); ctx.translate(0, -MOUNT_H * S); }
 
   if (G.rush[s.team] > 0 && s.moving) {          // 무마찰 돌격 중 잔상
     ctx.globalAlpha = .35; ctx.strokeStyle = '#9ae8ff'; ctx.lineWidth = 2 * S;
