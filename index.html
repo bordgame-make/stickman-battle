@@ -105,6 +105,9 @@ input.pdot:hover{border-color:var(--hi)}
 .netbox{margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel2)}
 .netbox h4{font-size:12.5px;font-weight:800;margin-bottom:8px;color:var(--ink)}
 .netrow{display:flex;gap:7px;align-items:center;margin-top:7px}
+.netbox input[type=text]{flex:1;min-width:0;background:#0e141b;border:1px solid var(--line);color:var(--ink);
+  border-radius:7px;padding:7px 9px;font-size:12px;font-weight:700;font-family:inherit}
+.netbox input[type=text]:focus{outline:none;border-color:var(--hi)}
 .netbox textarea{width:100%;height:58px;background:#0e141b;border:1px solid var(--line);color:var(--ink);
   border-radius:7px;padding:7px;font-size:10.5px;font-family:ui-monospace,Menlo,monospace;resize:vertical}
 .netbox button{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;
@@ -216,9 +219,21 @@ input.pdot:hover{border-color:var(--hi)}
     <div class="netbox" id="netBox">
       <h4>온라인 PvP — 서버 없이 둘이 직접 연결한다</h4>
       <div class="netrow">
+        <label for="nickIn" style="font-size:11.5px;color:var(--dim);white-space:nowrap">닉네임</label>
+        <input type="text" id="nickIn" maxlength="12" placeholder="12자까지">
+      </div>
+      <div class="netrow">
+        <button class="pri" id="netRand">랜덤 매칭</button>
+        <button id="netOff" disabled>연결 끊기</button>
+      </div>
+      <div class="netrow">
         <button id="netHost">방 만들기</button>
         <button id="netJoin">참가하기</button>
-        <button id="netOff" disabled>연결 끊기</button>
+        <button id="netAdv">중계 서버 바꾸기</button>
+      </div>
+      <div class="netrow" id="netSrvRow" style="display:none">
+        <label for="netSrv" style="font-size:11.5px;color:var(--dim);white-space:nowrap">중계</label>
+        <input type="text" id="netSrv" value="wss://broker.hivemq.com:8884/mqtt">
       </div>
       <div id="netStep1" style="display:none">
         <div class="netrow"><span style="font-size:11.5px;color:var(--dim)" id="netLbl1">내 코드 — 상대에게 보내세요</span></div>
@@ -230,7 +245,7 @@ input.pdot:hover{border-color:var(--hi)}
         <textarea id="netIn" placeholder="상대에게 받은 코드를 붙여넣고 아래 버튼"></textarea>
         <div class="netrow"><button class="pri" id="netGo">코드 넣기</button></div>
       </div>
-      <div class="netst" id="netSt">꺼짐 — 한 명이 <b>방 만들기</b>, 다른 한 명이 <b>참가하기</b>를 누르고 코드를 두 번 주고받으면 연결된다.</div>
+      <div class="netst" id="netSt">꺼짐 — <b>랜덤 매칭</b>은 아무나와 붙고, <b>방 만들기 / 참가하기</b>는 아는 사람과 코드를 주고받아 붙는다.</div>
     </div>
 
     <div class="hint">코인 하나가 공 하나다. 병사를 사면 그 값만큼 코인이 빠진다.<br>
@@ -344,7 +359,9 @@ input.pdot:hover{border-color:var(--hi)}
     <b>SHOP</b> — 상점 보드로 넘어간다. 칸마다 필요한 개수가 다르고, 다 채워야 강한 병사가 나온다. 필요 개수가 클수록 강하다.<br>
     <b>베이스</b> — 적이 다가오면 꼭대기에서 알아서 쏜다. 베이스 체력이 0이 되면 점령.<br>
     <b>고용 탭</b> — 공 대신 코인을 쓴다. 한 진영에 팀 하나, 옆 패널의 버튼으로 직접 사거나 AI에게 맡긴다. 사람끼리면 PvP, 한쪽만 사람이면 PvE, 둘 다 AI면 EvE다.<br>
-    <b>온라인 PvP</b> — 고용 탭 안에서 서버 없이 둘이 직접 연결한다. 한 명이 <b>방 만들기</b>, 다른 한 명이 <b>참가하기</b>를 누르고 코드를 두 번 주고받으면 된다. 방장이 왼쪽, 참가자가 오른쪽을 맡고, 각자 자기 진영만 고른다. 판은 방장 쪽에서 돌아가므로 설정·시작·배속은 방장이 정한다.
+    <b>온라인 PvP</b> — 고용 탭 안에 있다. <b>랜덤 매칭</b>은 닉네임을 적고 누르기만 하면 같은 시간에 누른 다른 사람과 자동으로 붙는다. 아는 사람과 하려면 <b>방 만들기 / 참가하기</b>로 코드를 두 번 주고받으면 된다.<br>
+    방장이 왼쪽, 참가자가 오른쪽을 맡고 각자 자기 진영만 고른다. 판은 방장 쪽에서 돌아가므로 설정·시작·배속은 방장이 정한다. 닉네임은 전투 화면 이름표에 팀 이름과 같이 나온다.<br>
+    랜덤 매칭은 서로를 찾는 동안만 공개 중계 서버를 거치고, 붙은 뒤에는 둘이 직접 주고받는다. 중계가 막혀 있으면 <b>중계 서버 바꾸기</b>로 다른 주소를 넣거나 코드 방식을 쓰면 된다.
   </div>
 </div></div>
 
@@ -2854,6 +2871,11 @@ function setMode(m) {
 }
 document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
 
+document.getElementById('netRand').onclick = netRandom;
+document.getElementById('netAdv').onclick = () => {
+  const r = document.getElementById('netSrvRow');
+  r.style.display = r.style.display === 'none' ? 'flex' : 'none';
+};
 document.getElementById('netHost').onclick = netHostStart;
 document.getElementById('netJoin').onclick = netJoinStart;
 document.getElementById('netOff').onclick = netClose;
@@ -2953,12 +2975,15 @@ document.querySelectorAll('.presets button').forEach(b => b.onclick = () => {
    10. 시작 / 루프
    ============================================================ */
 function sideName(t, max) {
+  const nick = NET.on ? (NET.role === 'host' ? (t === 0 ? NET.nick : NET.peerNick)
+                                             : (t === 1 ? NET.nick : NET.peerNick)) : '';
   const cnt = new Map();
   for (const td of G.roster[t]) cnt.set(td.name, (cnt.get(td.name) || 0) + 1);
   const parts = [...cnt.entries()].map(([nm, c]) => c > 1 ? nm + ' ×' + c : nm);
   const m = max || 2;
-  if (parts.length <= m) return parts.join(' + ');
-  return parts.slice(0, m).join(' + ') + ' 외 ' + (parts.length - m) + '종류';
+  const tag = nick ? nick + ' · ' : '';
+  if (parts.length <= m) return tag + parts.join(' + ');
+  return tag + parts.slice(0, m).join(' + ') + ' 외 ' + (parts.length - m) + '종류';
 }
 
 // 같은 진영 안에서 팀끼리 구분되게 색을 조금씩 눌러준다
@@ -3074,6 +3099,66 @@ const WKEYS = Object.keys(WEAPONS);                  // 양쪽 파일이 같으�
 const WIDX = {}; WKEYS.forEach((k, i) => { WIDX[k] = i; });
 const STYLES = ['stick','armor','blob','insect','demon','robot','skeleton','winged','beast','mushroom','chef','ys','plain'];
 
+/* 아주 작은 MQTT(3.1.1) 클라이언트 — 랜덤 매칭에서 서로를 찾는 데만 쓴다.
+   붙고 나면 통신은 둘이 직접 하고 중계는 더 쓰지 않는다. 외부 라이브러리 없음. */
+function mqttConnect(url, onMsg, onUp, onErr) {
+  let ws;
+  try { ws = new WebSocket(url, ['mqtt']); } catch (e) { onErr && onErr(e.message); return null; }
+  ws.binaryType = 'arraybuffer';
+  let pid = 1, ping = null;
+
+  const enc = str => {                               // UTF-8 + 길이 2바이트
+    const b = new TextEncoder().encode(str);
+    return [b.length >> 8, b.length & 255, ...b];
+  };
+  const remLen = n => {                              // 가변 길이
+    const out = [];
+    do { let d = n % 128; n = Math.floor(n / 128); out.push(d | (n > 0 ? 128 : 0)); } while (n > 0);
+    return out;
+  };
+  const send = (type, body) => {
+    if (ws.readyState !== 1) return;
+    ws.send(new Uint8Array([type, ...remLen(body.length), ...body]).buffer);
+  };
+
+  const api = {
+    ok: false, done: false,                          // done = 우리가 일부러 끊은 것
+    sub(topic) { send(0x82, [pid >> 8, pid++ & 255, ...enc(topic), 0]); },
+    pub(topic, payload) { send(0x30, [...enc(topic), ...new TextEncoder().encode(payload)]); },
+    close() { api.done = true; try { clearInterval(ping); ws.close(); } catch (e) {} }
+  };
+
+  ws.onopen = () => {
+    const cid = 'pb' + Math.random().toString(16).slice(2, 10);
+    send(0x10, [...enc('MQTT'), 4, 2, 0, 60, ...enc(cid)]);   // CONNECT
+    ping = setInterval(() => send(0xC0, []), 30000);
+  };
+  ws.onerror = () => { if (!api.done) onErr && onErr('중계 서버에 연결할 수 없다'); };
+  ws.onclose = () => { clearInterval(ping); if (api.ok && !api.done) onErr && onErr('중계 연결이 끊겼다'); };
+  ws.onmessage = ev => {
+    const d = new Uint8Array(ev.data);
+    let i = 0;
+    while (i < d.length) {
+      const type = d[i] >> 4;
+      let mult = 1, len = 0, j = i + 1, b;
+      do { b = d[j++]; len += (b & 127) * mult; mult *= 128; } while (b & 128);
+      const body = d.subarray(j, j + len);
+      if (type === 2) { api.ok = true; onUp && onUp(); }          // CONNACK
+      else if (type === 3) {                                       // PUBLISH
+        const tl = (body[0] << 8) | body[1];
+        const topic = new TextDecoder().decode(body.subarray(2, 2 + tl));
+        const msg = new TextDecoder().decode(body.subarray(2 + tl));
+        try { onMsg(topic, msg); } catch (e) {}
+      }
+      i = j + len;
+    }
+  };
+  return api;
+}
+
+const LOBBY = 'plinkobattle/lobby/v2';
+const INBOX = id => 'plinkobattle/p/' + id;
+
 const NET = {
   on: false, role: null,            // 'host' | 'guest'
   pc: null, ch: null,
@@ -3083,7 +3168,9 @@ const NET = {
   snap: null, prev: null,           // 참가자가 받은 최근 두 장면
   peerTeam: 1, peerCol: '#ef4444',  // 참가자가 고른 팀
   peerName: '-',
-  lastRecv: 0
+  lastRecv: 0,
+  nick: '', peerNick: '',
+  mq: null, myId: null, mate: null, mmT: null, waitT: null, matching: false
 };
 
 function netSt(msg, ok) {
@@ -3095,6 +3182,8 @@ const packCode = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).repl
 const unpackCode = t => JSON.parse(decodeURIComponent(escape(atob(t.trim()))));
 
 function netClose() {
+  stopMatching();
+  NET.mate = null; NET.peerNick = '';
   if (NET.ch) { try { NET.ch.close(); } catch (e) {} }
   if (NET.pc) { try { NET.pc.close(); } catch (e) {} }
   NET.on = false; NET.role = null; NET.pc = null; NET.ch = null;
@@ -3104,7 +3193,8 @@ function netClose() {
   document.getElementById('netOff').disabled = true;
   document.getElementById('netHost').disabled = false;
   document.getElementById('netJoin').disabled = false;
-  netSt('꺼짐 — 한 명이 <b>방 만들기</b>, 다른 한 명이 <b>참가하기</b>를 누르세요.');
+  document.getElementById('netRand').disabled = false;
+  netSt('꺼짐 — <b>랜덤 매칭</b>은 아무나와, <b>방 만들기 / 참가하기</b>는 아는 사람과 붙는다.');
   refresh('A'); refresh('B');
 }
 
@@ -3136,7 +3226,12 @@ function hookChannel(ch) {
   NET.ch = ch;
   ch.onopen = () => {
     NET.ready = true;
-    netSt('연결됨 — <b>' + (NET.role === 'host' ? '방장' : '참가자') + '</b>. ' +
+    clearTimeout(NET.waitT); NET.waitT = null;
+    stopMatching();                            // 붙었으니 중계는 더 안 쓴다
+    if (!NET.nick) NET.nick = myNick();
+    netSend({ t: 'nick', n: NET.nick });
+    netSt('<b>' + NET.nick + '</b> vs <b>' + (NET.peerNick || '상대') + '</b> — ' +
+          (NET.role === 'host' ? '방장' : '참가자') + '. ' +
           (NET.role === 'host' ? '팀을 고르고 <b>고용 시작</b>을 누르면 둘 다 시작한다.'
                                : '팀만 고르면 된다. 시작은 방장이 누른다.'), 1);
     document.getElementById('netStep1').style.display = 'none';
@@ -3153,7 +3248,9 @@ async function netHostStart() {
   NET.on = true; NET.role = 'host';
   document.getElementById('netHost').disabled = true;
   document.getElementById('netJoin').disabled = true;
+  document.getElementById('netRand').disabled = true;
   document.getElementById('netOff').disabled = false;
+  NET.nick = myNick();
   NET.pc = newPeer();
   hookChannel(NET.pc.createDataChannel('g', { ordered: true }));
   const off = await NET.pc.createOffer();
@@ -3173,7 +3270,9 @@ async function netJoinStart() {
   NET.on = true; NET.role = 'guest';
   document.getElementById('netHost').disabled = true;
   document.getElementById('netJoin').disabled = true;
+  document.getElementById('netRand').disabled = true;
   document.getElementById('netOff').disabled = false;
+  NET.nick = myNick();
   NET.pc = newPeer();
   NET.pc.ondatachannel = e => hookChannel(e.channel);
   document.getElementById('netLbl2').textContent = '① 방장이 준 코드를 붙여넣으세요';
@@ -3206,6 +3305,111 @@ async function netTakeCode() {
 }
 
 const netSend = o => { if (NET.ready) try { NET.ch.send(JSON.stringify(o)); } catch (e) {} };
+
+/* ── 랜덤 매칭 ──
+   중계(MQTT)에 모여서 서로를 찾고, 연결이 되면 중계는 끊는다.
+   둘이 동시에 손을 들면 아이디가 작은 쪽이 방장을 맡는다. */
+function myNick() {
+  const v = (document.getElementById('nickIn').value || '').trim().slice(0, 12);
+  return v || ('손님' + Math.floor(Math.random() * 900 + 100));
+}
+
+function stopMatching(keepMq) {
+  clearInterval(NET.mmT); NET.mmT = null;
+  clearTimeout(NET.waitT); NET.waitT = null; NET.matching = false;
+  if (!keepMq && NET.mq) { NET.mq.close(); NET.mq = null; }
+}
+
+function netRandom() {
+  netClose();
+  NET.nick = myNick();
+  document.getElementById('nickIn').value = NET.nick;
+  NET.on = true; NET.matching = true; NET.mate = null;
+  NET.myId = Math.random().toString(36).slice(2, 10);
+  document.getElementById('netHost').disabled = true;
+  document.getElementById('netJoin').disabled = true;
+  document.getElementById('netRand').disabled = true;
+  document.getElementById('netOff').disabled = false;
+  netSt('중계 서버에 접속하는 중…');
+
+  const url = document.getElementById('netSrv').value.trim();
+  NET.mq = mqttConnect(url, mmMsg,
+    () => {
+      NET.mq.sub(LOBBY); NET.mq.sub(INBOX(NET.myId));
+      netSt('상대를 찾는 중… <b>' + NET.nick + '</b>');
+      const announce = () => {
+        if (!NET.matching || NET.mate) return;
+        NET.mq.pub(LOBBY, JSON.stringify({ t: 'hi', id: NET.myId, n: NET.nick }));
+      };
+      announce();
+      NET.mmT = setInterval(announce, 2000);
+    },
+    err => { netSt('랜덤 매칭 실패 — ' + err + '. <b>중계 서버 바꾸기</b>로 다른 주소를 넣거나, 방 만들기/참가하기를 쓰세요.'); stopMatching(); });
+}
+
+// 상대가 다른 사람과 붙어버리면 이쪽은 영영 기다리게 된다. 일정 시간 안에 안 붙으면 풀고 다시 찾는다.
+function mmDrop(why) {
+  if (NET.ready) return;
+  clearTimeout(NET.waitT); NET.waitT = null;
+  if (NET.pc) { try { NET.pc.close(); } catch (e) {} NET.pc = null; }
+  NET.ch = null; NET.mate = null; NET.peerNick = ''; NET.role = null;
+  if (NET.matching) netSt('상대를 찾는 중… <b>' + NET.nick + '</b>' + (why ? ' (' + why + ')' : ''));
+}
+function mmWait() {
+  clearTimeout(NET.waitT);
+  NET.waitT = setTimeout(() => mmDrop('다른 상대를 찾는 중'), 7000);
+}
+
+async function mmMsg(topic, raw) {
+  let m; try { m = JSON.parse(raw); } catch (e) { return; }
+  if (!m || m.id === NET.myId) return;
+
+  // 로비에서 누가 손을 들었다
+  // 이미 누구와 붙는 중인데 다른 사람이 부르면 바로 거절해 준다
+  if (m.t === 'offer' && m.to === NET.myId && NET.mate && NET.mate !== m.id) {
+    NET.mq.pub(INBOX(m.id), JSON.stringify({ t: 'busy', id: NET.myId, to: m.id }));
+    return;
+  }
+  if (m.t === 'busy' && m.to === NET.myId && NET.mate === m.id) { mmDrop('상대가 다른 사람과 붙었다'); return; }
+
+  if (m.t === 'hi' && NET.matching && !NET.mate) {
+    if (NET.myId < m.id) {                       // 아이디가 작은 쪽이 방장
+      NET.mate = m.id; NET.peerNick = m.n || '상대';
+      NET.role = 'host';
+      netSt('<b>' + NET.peerNick + '</b> 과(와) 연결하는 중…');
+      NET.pc = newPeer();
+      hookChannel(NET.pc.createDataChannel('g', { ordered: true }));
+      const off = await NET.pc.createOffer();
+      await NET.pc.setLocalDescription(off);
+      await gatherDone(NET.pc);
+      NET.mq.pub(INBOX(m.id), JSON.stringify({ t: 'offer', id: NET.myId, n: NET.nick,
+                                               to: m.id, sdp: NET.pc.localDescription }));
+      mmWait();
+    }
+    return;
+  }
+  // 방장이 보낸 초대
+  if (m.t === 'offer' && m.to === NET.myId && NET.matching && !NET.mate) {
+    NET.mate = m.id; NET.peerNick = m.n || '상대';
+    NET.role = 'guest';
+    netSt('<b>' + NET.peerNick + '</b> 과(와) 연결하는 중…');
+    NET.pc = newPeer();
+    NET.pc.ondatachannel = e => hookChannel(e.channel);
+    await NET.pc.setRemoteDescription(m.sdp);
+    const ans = await NET.pc.createAnswer();
+    await NET.pc.setLocalDescription(ans);
+    await gatherDone(NET.pc);
+    NET.mq.pub(INBOX(m.id), JSON.stringify({ t: 'answer', id: NET.myId, n: NET.nick,
+                                             to: m.id, sdp: NET.pc.localDescription }));
+    mmWait();
+    return;
+  }
+  // 참가자가 보낸 답
+  if (m.t === 'answer' && m.to === NET.myId && NET.role === 'host' && NET.mate === m.id) {
+    NET.peerNick = m.n || NET.peerNick;
+    try { await NET.pc.setRemoteDescription(m.sdp); } catch (e) { netSt('연결 실패: ' + e.message); }
+  }
+}
 
 // 참가자가 고른 팀을 방장에게 알린다
 function netSendTeam() {
@@ -3337,6 +3541,13 @@ function stepFx(dt) {
 }
 
 function netRecv(m) {
+  if (m.t === 'nick') {
+    NET.peerNick = (m.n || '상대').slice(0, 12);
+    netSt('<b>' + NET.nick + '</b> vs <b>' + NET.peerNick + '</b> — ' +
+          (NET.role === 'host' ? '방장. 팀을 고르고 시작을 누르세요.' : '참가자. 팀만 고르면 된다.'), 1);
+    if (NET.role === 'host') netSend({ t: 'nick', n: NET.nick });
+    return;
+  }
   if (m.t === 'team' && NET.role === 'host') {           // 참가자가 고른 팀
     NET.peerTeam = m.i; NET.peerCol = m.col;
     sel[1] = [{ i: m.i, pow: m.pow, wp: m.wp, spd: m.spd, col: m.col }];
