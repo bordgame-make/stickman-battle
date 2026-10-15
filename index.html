@@ -102,6 +102,19 @@ input.pdot:hover{border-color:var(--hi)}
   border-radius:8px;padding:6px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit}
 .presets button:hover{border-color:#4a5a6e;color:var(--ink)}
 @media(max-width:1100px){#mini{width:330px;height:74px}}
+.netbox{margin-top:14px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--panel2)}
+.netbox h4{font-size:12.5px;font-weight:800;margin-bottom:8px;color:var(--ink)}
+.netrow{display:flex;gap:7px;align-items:center;margin-top:7px}
+.netbox textarea{width:100%;height:58px;background:#0e141b;border:1px solid var(--line);color:var(--ink);
+  border-radius:7px;padding:7px;font-size:10.5px;font-family:ui-monospace,Menlo,monospace;resize:vertical}
+.netbox button{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;
+  padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.netbox button:hover:not(:disabled){border-color:var(--hi)}
+.netbox button:disabled{color:#4d5868;cursor:default}
+.netbox button.pri{background:var(--hi);border-color:var(--hi);color:#1a1206}
+.netst{font-size:11.5px;color:var(--dim);margin-top:8px;line-height:1.6}
+.netst b{color:var(--hi)}
+.netst.ok b{color:#6fd36f}
 .tabs{display:flex;gap:8px;justify-content:center;margin:14px 0 4px}
 .tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:10px;
   padding:9px 26px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit}
@@ -200,6 +213,26 @@ input.pdot:hover{border-color:var(--hi)}
       <button data-w="1">1배</button>
       <button data-w="1.5">1.5배</button>
     </div>
+    <div class="netbox" id="netBox">
+      <h4>온라인 PvP — 서버 없이 둘이 직접 연결한다</h4>
+      <div class="netrow">
+        <button id="netHost">방 만들기</button>
+        <button id="netJoin">참가하기</button>
+        <button id="netOff" disabled>연결 끊기</button>
+      </div>
+      <div id="netStep1" style="display:none">
+        <div class="netrow"><span style="font-size:11.5px;color:var(--dim)" id="netLbl1">내 코드 — 상대에게 보내세요</span></div>
+        <textarea id="netOut" readonly placeholder="코드가 여기 나옵니다"></textarea>
+        <div class="netrow"><button id="netCopy">코드 복사</button></div>
+      </div>
+      <div id="netStep2" style="display:none">
+        <div class="netrow"><span style="font-size:11.5px;color:var(--dim)" id="netLbl2">상대 코드를 붙여넣으세요</span></div>
+        <textarea id="netIn" placeholder="상대에게 받은 코드를 붙여넣고 아래 버튼"></textarea>
+        <div class="netrow"><button class="pri" id="netGo">코드 넣기</button></div>
+      </div>
+      <div class="netst" id="netSt">꺼짐 — 한 명이 <b>방 만들기</b>, 다른 한 명이 <b>참가하기</b>를 누르고 코드를 두 번 주고받으면 연결된다.</div>
+    </div>
+
     <div class="hint">코인 하나가 공 하나다. 병사를 사면 그 값만큼 코인이 빠진다.<br>
     적 병사를 잡으면 <b>그 병사 값 × W</b>를 반올림한 만큼 코인이 들어온다. 비싼 병사를 잡을수록 많이 받는다.<br>
     정해둔 간격마다 양쪽에 코인이 하나씩 들어온다. 간격을 줄이면 전투가 빨라진다.<br>
@@ -310,7 +343,8 @@ input.pdot:hover{border-color:var(--hi)}
     <b>WEAPON</b> — 아래 무기 보드로 넘어가고, 바닥 선에 닿은 무기를 든 병사가 나온다.<br>
     <b>SHOP</b> — 상점 보드로 넘어간다. 칸마다 필요한 개수가 다르고, 다 채워야 강한 병사가 나온다. 필요 개수가 클수록 강하다.<br>
     <b>베이스</b> — 적이 다가오면 꼭대기에서 알아서 쏜다. 베이스 체력이 0이 되면 점령.<br>
-    <b>고용 탭</b> — 공 대신 코인을 쓴다. 한 진영에 팀 하나, 옆 패널의 버튼으로 직접 사거나 AI에게 맡긴다. 사람끼리면 PvP, 한쪽만 사람이면 PvE, 둘 다 AI면 EvE다.
+    <b>고용 탭</b> — 공 대신 코인을 쓴다. 한 진영에 팀 하나, 옆 패널의 버튼으로 직접 사거나 AI에게 맡긴다. 사람끼리면 PvP, 한쪽만 사람이면 PvE, 둘 다 AI면 EvE다.<br>
+    <b>온라인 PvP</b> — 고용 탭 안에서 서버 없이 둘이 직접 연결한다. 한 명이 <b>방 만들기</b>, 다른 한 명이 <b>참가하기</b>를 누르고 코드를 두 번 주고받으면 된다. 방장이 왼쪽, 참가자가 오른쪽을 맡고, 각자 자기 진영만 고른다. 판은 방장 쪽에서 돌아가므로 설정·시작·배속은 방장이 정한다.
   </div>
 </div></div>
 
@@ -639,7 +673,7 @@ function T(name, col, style, basics, shop) {
 T('현대 군대','#4a7c3f','armor',['rifle','pistol','shotgun','knife','grenade'],
   [['중기관총병',8,'mg',1.8,1.5,1.15],['저격수',12,'sniper',1.2,3,1],['로켓병',18,'rpg',2,2.5,1.2],['전차병',28,'cannon',5,3,1.85]]);
 T('중세 군대','#8a6b3a','armor',['sword','spear','bow','axe','dagger'],
-  [['기병',3,'lance',1.5,1.4,1.15],['석궁병',7,'crossbow',1.2,1.6,1],['기사',11,'greatsword',2.5,1.8,1.3],['미늘창병',16,'halberd',2.2,2.2,1.25],['성기사',27,'holyspear',5,3,1.75]]);
+  [['기병',6,'lance',1.5,1.4,1.15],['석궁병',7,'crossbow',1.2,1.6,1],['기사',11,'greatsword',2.5,1.8,1.3],['미늘창병',16,'halberd',2.2,2.2,1.25],['성기사',27,'holyspear',5,3,1.75]]);
 T('베놈','#3a2b4d','blob',['claw','tentacle','websh','bite','acidspit'],
   [['심비오트',8,'shadowclaw',2,1.8,1.2],['독액포',13,'acidspit',1.6,2.4,1.1],['거대촉수',20,'tentacle',3.2,2.4,1.5],['베놈킹',30,'shadowclaw',6,3.2,2.05]]);
 T('알 증식','#d9c47a','insect',['bite','sting','eggthrow','claw','pincer'],
@@ -2605,6 +2639,9 @@ function buildGrid(side) {
     d.className = 'tcard';
     d.innerHTML = '<b>' + t.name + '</b><i>' + (t.shop[3] ? t.shop[3].name : '표적') + '</i>';
     d.onclick = e => {                       // 클릭 = 하나 추가, Shift+클릭 = 하나 빼기
+      if (NET.on && si !== (NET.role === 'host' ? 0 : 1)) {   // 상대 진영은 못 건드린다
+        netSt('상대 진영은 상대가 고른다.'); return;
+      }
       if (e.shiftKey) dropOne(si, i);
       else if (MODE === 'hire') sel[si] = [{ i, pow: 1, wp: -1, spd: 1 }];   // 고용은 한 팀만
       else sel[si].push({ i, pow: 1, wp: -1, spd: 1 });
@@ -2669,7 +2706,7 @@ function refresh(side) {
     dot.type = 'color'; dot.className = 'pdot';
     dot.value = e.col || auto;
     dot.title = t.name + ' 색 — 누르면 바꾼다';
-    dot.oninput = () => { e.col = dot.value; };
+    dot.oninput = () => { e.col = dot.value; netSendTeam(); };
 
     const nm = document.createElement('span');
     nm.className = 'pname';
@@ -2680,7 +2717,7 @@ function refresh(side) {
 
     const val = document.createElement('b');
     val.textContent = (+e.pow).toFixed(1) + '×';
-    sl.oninput = () => { e.pow = +sl.value; val.textContent = e.pow.toFixed(1) + '×'; };
+    sl.oninput = () => { e.pow = +sl.value; val.textContent = e.pow.toFixed(1) + '×'; netSendTeam(); };
 
     row.append(dot, nm, sl, val);
     list.appendChild(row);
@@ -2709,6 +2746,7 @@ function refresh(side) {
       ws.onchange = () => {
         e.wp = +ws.value;
         ws.classList.toggle('lock', e.wp >= 0);
+        netSendTeam();
       };
     }
     row2.append(tag, ws);
@@ -2725,7 +2763,7 @@ function refresh(side) {
     sp.value = e.spd;
     const spv = document.createElement('b');
     spv.textContent = (+e.spd).toFixed(1) + '×';
-    sp.oninput = () => { e.spd = +sp.value; spv.textContent = e.spd.toFixed(1) + '×'; };
+    sp.oninput = () => { e.spd = +sp.value; spv.textContent = e.spd.toFixed(1) + '×'; netSendTeam(); };
     row3.append(tag3, sp, spv);
     list.appendChild(row3);
   });
@@ -2779,9 +2817,12 @@ function refresh(side) {
   sum.style.cssText = 'color:var(--hi);margin-top:7px';
   sum.textContent = '연합군 ' + n + '팀 (' + cnt.size + '종류)';
   det.appendChild(sum);
+  if (NET.on && NET.role === 'guest' && side === 'B' && NET.ready) netSendTeam();
   const btn = document.getElementById('startBtn');
   btn.disabled = !sel[0].length || !sel[1].length;
   btn.textContent = btn.disabled ? '양쪽 진영에서 팀을 고르세요'
+    : MODE === 'hire' && NET.on
+      ? (NET.role === 'host' ? '고용 시작 (온라인 — 방장)' : '방장이 시작하기를 기다리는 중')
     : MODE === 'hire'
       ? '고용 시작 (' + (CTRL[0] === 'human' ? '사람' : 'AI') + ' vs ' + (CTRL[1] === 'human' ? '사람' : 'AI') + ')'
       : '전투 시작 (' + sel[0].length + '팀 vs ' + sel[1].length + '팀)';
@@ -2795,10 +2836,13 @@ function syncCtl() {
   });
   refresh('A');
 }
-ctlA.onclick = () => { CTRL[0] = CTRL[0] === 'human' ? 'ai' : 'human'; syncCtl(); };
-ctlB.onclick = () => { CTRL[1] = CTRL[1] === 'human' ? 'ai' : 'human'; syncCtl(); };
+ctlA.onclick = () => { if (NET.on) return netSt('온라인에서는 둘 다 사람이다.');
+  CTRL[0] = CTRL[0] === 'human' ? 'ai' : 'human'; syncCtl(); };
+ctlB.onclick = () => { if (NET.on) return netSt('온라인에서는 둘 다 사람이다.');
+  CTRL[1] = CTRL[1] === 'human' ? 'ai' : 'human'; syncCtl(); };
 function setMode(m) {
   MODE = m;
+  if (m !== 'hire' && NET.on) netClose();          // 시뮬레이션으로 가면 연결을 끊는다
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
   document.getElementById('hireOpts').style.display = m === 'hire' ? 'block' : 'none';
   document.querySelectorAll('.simonly').forEach(e => e.style.display = m === 'hire' ? 'none' : '');
@@ -2809,6 +2853,17 @@ function setMode(m) {
   refresh('A'); refresh('B');
 }
 document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+document.getElementById('netHost').onclick = netHostStart;
+document.getElementById('netJoin').onclick = netJoinStart;
+document.getElementById('netOff').onclick = netClose;
+document.getElementById('netGo').onclick = netTakeCode;
+document.getElementById('netCopy').onclick = () => {
+  const ta = document.getElementById('netOut');
+  ta.select();
+  try { document.execCommand('copy'); netSt('코드를 복사했다. 상대에게 보내세요.'); }
+  catch (e) { netSt('복사가 안 되면 칸의 글자를 직접 전부 골라 복사하세요.'); }
+};
 
 const coinNum = document.getElementById('coinNum');
 const incRange = document.getElementById('incRange'), incVal = document.getElementById('incVal');
@@ -2884,6 +2939,7 @@ document.querySelectorAll('.presets button').forEach(b => b.onclick = () => {
   if (b.dataset.iv) { ivRange.value = b.dataset.iv; syncIv(); }
   if (b.dataset.nuke !== undefined) { nukeRange.value = b.dataset.nuke; syncNuke(); }
   if (b.dataset.ctl) {
+    if (NET.on) { netSt('온라인에서는 둘 다 사람이다.'); return; }
     const m = b.dataset.ctl;
     CTRL = m === 'pvp' ? ['human', 'human'] : m === 'eve' ? ['ai', 'ai'] : ['human', 'ai'];
     syncCtl();
@@ -2914,7 +2970,7 @@ function tintCol(hex, i, n) {
   return '#' + [mix(v(1)), mix(v(3)), mix(v(5))].map(c => c.toString(16).padStart(2, '0')).join('');
 }
 
-function startGame() {
+function startGame(asGuest) {
   G.roster = [sel[0].map(e => TEAMS[e.i]), sel[1].map(e => TEAMS[e.i])];
   G.pow = [sel[0].map(e => e.pow), sel[1].map(e => e.pow)];
   G.wlock = [sel[0].map(e => wlockOf(e)), sel[1].map(e => wlockOf(e))];
@@ -2948,9 +3004,11 @@ function startGame() {
   MAX_BALL = MAX_BALL_SIDE;                  // 팀이 하나뿐이면 상한을 다 쓸 수 있게
   MAX_SOLD = capOf(soldNum, INF.sold, 130);
   SIZE_MUL = clamp(parseFloat(szRange.value) || 1, .4, 2.5);
-  COIN_START = Math.max(0, Math.floor(+coinNum.value) || 0);
-  COIN_EVERY = clamp(parseFloat(incRange.value) || 10, 1, 60);
-  KILL_W     = clamp(parseFloat(wRange.value), 0, 2);
+  if (!asGuest) {                                  // 참가자는 방장이 보낸 값을 그대로 쓴다
+    COIN_START = Math.max(0, Math.floor(+coinNum.value) || 0);
+    COIN_EVERY = clamp(parseFloat(incRange.value) || 10, 1, 60);
+    KILL_W     = clamp(parseFloat(wRange.value), 0, 2);
+  }
   G.coin = [COIN_START, COIN_START]; G.incT = 0; G.aiT = [0, 0]; G.earn = [COIN_START, COIN_START];
   G.t = 0; G.spawnT = SPAWN_EVERY; G.over = false; G.winner = -1; G.rage = 1;
   G.speed = 1; G.cam.x = WORLD_W / 2; G.cam.s = .8;
@@ -2984,16 +3042,326 @@ function startGame() {
   document.getElementById('setup').style.display = 'none';
   document.getElementById('game').style.display = 'flex';
   resizeField();
+  if (NET.on && NET.role === 'host' && !asGuest) {   // 참가자도 같은 판을 차리게 한다
+    NET.started = true;
+    netSend({ t: 'go', a: sel[0][0], b: sel[1][0], ca: colA.value, cb: colB.value,
+              coin: COIN_START, every: COIN_EVERY, w: KILL_W });
+  }
 }
-document.getElementById('startBtn').onclick = startGame;
+document.getElementById('startBtn').onclick = () => {
+  if (NET.on && NET.role === 'guest') { netSt('시작은 방장이 누른다.'); return; }
+  startGame();
+};
 document.getElementById('again').onclick = document.getElementById('again2').onclick = () => {
   document.getElementById('game').style.display = 'none';
   document.getElementById('setup').style.display = 'block';
 };
 document.querySelectorAll('.spd button').forEach(b => b.onclick = () => {
+  if (NET.on && NET.role === 'guest') {
+    document.getElementById('tip').textContent = '배속은 방장이 정한다';
+    return;
+  }
   G.speed = parseFloat(b.dataset.s);
   document.querySelectorAll('.spd button').forEach(o => o.classList.toggle('on', o === b));
 });
+
+/* ============================================================
+   온라인 PvP — 서버 없이 둘이 직접 연결한다 (WebRTC)
+   방장이 시뮬레이션을 돌리고, 참가자는 화면만 받아 그린다.
+   참가자가 누른 구매는 방장에게 보내져 방장이 처리한다.
+   ============================================================ */
+const WKEYS = Object.keys(WEAPONS);                  // 양쪽 파일이 같으니 번호로 주고받는다
+const WIDX = {}; WKEYS.forEach((k, i) => { WIDX[k] = i; });
+const STYLES = ['stick','armor','blob','insect','demon','robot','skeleton','winged','beast','mushroom','chef','ys','plain'];
+
+const NET = {
+  on: false, role: null,            // 'host' | 'guest'
+  pc: null, ch: null,
+  ready: false,                     // 데이터 통로가 열렸는지
+  started: false,
+  sendT: 0, rate: 1 / 15,           // 초당 15번 보낸다
+  snap: null, prev: null,           // 참가자가 받은 최근 두 장면
+  peerTeam: 1, peerCol: '#ef4444',  // 참가자가 고른 팀
+  peerName: '-',
+  lastRecv: 0
+};
+
+function netSt(msg, ok) {
+  const e = document.getElementById('netSt');
+  if (e) { e.innerHTML = msg; e.className = 'netst' + (ok ? ' ok' : ''); }
+}
+
+const packCode = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=+$/, '');
+const unpackCode = t => JSON.parse(decodeURIComponent(escape(atob(t.trim()))));
+
+function netClose() {
+  if (NET.ch) { try { NET.ch.close(); } catch (e) {} }
+  if (NET.pc) { try { NET.pc.close(); } catch (e) {} }
+  NET.on = false; NET.role = null; NET.pc = null; NET.ch = null;
+  NET.ready = false; NET.started = false; NET.snap = NET.prev = null;
+  document.getElementById('netStep1').style.display = 'none';
+  document.getElementById('netStep2').style.display = 'none';
+  document.getElementById('netOff').disabled = true;
+  document.getElementById('netHost').disabled = false;
+  document.getElementById('netJoin').disabled = false;
+  netSt('꺼짐 — 한 명이 <b>방 만들기</b>, 다른 한 명이 <b>참가하기</b>를 누르세요.');
+  refresh('A'); refresh('B');
+}
+
+function newPeer() {
+  const pc = new RTCPeerConnection({
+    iceServers: [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }]
+  });
+  pc.onconnectionstatechange = () => {
+    if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+      netSt('연결이 끊겼다. <b>연결 끊기</b>를 누르고 다시 시도하세요.');
+      NET.ready = false;
+    }
+  };
+  return pc;
+}
+
+// 후보 수집이 끝날 때까지 기다렸다가 한 번에 코드로 만든다
+function gatherDone(pc) {
+  return new Promise(res => {
+    if (pc.iceGatheringState === 'complete') return res();
+    const t = setTimeout(res, 2500);               // 너무 오래 끌지 않는다
+    pc.onicegatheringstatechange = () => {
+      if (pc.iceGatheringState === 'complete') { clearTimeout(t); res(); }
+    };
+  });
+}
+
+function hookChannel(ch) {
+  NET.ch = ch;
+  ch.onopen = () => {
+    NET.ready = true;
+    netSt('연결됨 — <b>' + (NET.role === 'host' ? '방장' : '참가자') + '</b>. ' +
+          (NET.role === 'host' ? '팀을 고르고 <b>고용 시작</b>을 누르면 둘 다 시작한다.'
+                               : '팀만 고르면 된다. 시작은 방장이 누른다.'), 1);
+    document.getElementById('netStep1').style.display = 'none';
+    document.getElementById('netStep2').style.display = 'none';
+    netSendTeam();
+    refresh('A'); refresh('B');
+  };
+  ch.onclose = () => { NET.ready = false; netSt('상대가 나갔다.'); };
+  ch.onmessage = e => { try { netRecv(JSON.parse(e.data)); } catch (err) {} };
+}
+
+async function netHostStart() {
+  netClose();
+  NET.on = true; NET.role = 'host';
+  document.getElementById('netHost').disabled = true;
+  document.getElementById('netJoin').disabled = true;
+  document.getElementById('netOff').disabled = false;
+  NET.pc = newPeer();
+  hookChannel(NET.pc.createDataChannel('g', { ordered: true }));
+  const off = await NET.pc.createOffer();
+  await NET.pc.setLocalDescription(off);
+  netSt('내 코드를 만드는 중…');
+  await gatherDone(NET.pc);
+  document.getElementById('netOut').value = packCode(NET.pc.localDescription);
+  document.getElementById('netLbl1').textContent = '① 내 코드 — 상대에게 보내세요';
+  document.getElementById('netLbl2').textContent = '② 상대가 보낸 답 코드를 붙여넣으세요';
+  document.getElementById('netStep1').style.display = 'block';
+  document.getElementById('netStep2').style.display = 'block';
+  netSt('방을 만들었다. ① 코드를 상대에게 보내고, 상대가 준 답 코드를 ②에 넣으세요.');
+}
+
+async function netJoinStart() {
+  netClose();
+  NET.on = true; NET.role = 'guest';
+  document.getElementById('netHost').disabled = true;
+  document.getElementById('netJoin').disabled = true;
+  document.getElementById('netOff').disabled = false;
+  NET.pc = newPeer();
+  NET.pc.ondatachannel = e => hookChannel(e.channel);
+  document.getElementById('netLbl2').textContent = '① 방장이 준 코드를 붙여넣으세요';
+  document.getElementById('netStep2').style.display = 'block';
+  document.getElementById('netStep1').style.display = 'none';
+  netSt('방장에게 받은 코드를 붙여넣고 <b>코드 넣기</b>를 누르세요.');
+}
+
+async function netTakeCode() {
+  const raw = document.getElementById('netIn').value.trim();
+  if (!raw) return netSt('붙여넣은 코드가 없다.');
+  let d;
+  try { d = unpackCode(raw); } catch (e) { return netSt('코드를 읽을 수 없다. 전부 복사했는지 확인하세요.'); }
+  try {
+    if (NET.role === 'guest') {
+      await NET.pc.setRemoteDescription(d);
+      const ans = await NET.pc.createAnswer();
+      await NET.pc.setLocalDescription(ans);
+      netSt('답 코드를 만드는 중…');
+      await gatherDone(NET.pc);
+      document.getElementById('netOut').value = packCode(NET.pc.localDescription);
+      document.getElementById('netLbl1').textContent = '② 답 코드 — 방장에게 보내세요';
+      document.getElementById('netStep1').style.display = 'block';
+      netSt('② 답 코드를 방장에게 보내면 연결된다.');
+    } else {
+      await NET.pc.setRemoteDescription(d);
+      netSt('답 코드를 받았다. 연결하는 중…');
+    }
+  } catch (e) { netSt('코드가 맞지 않는다: ' + e.message); }
+}
+
+const netSend = o => { if (NET.ready) try { NET.ch.send(JSON.stringify(o)); } catch (e) {} };
+
+// 참가자가 고른 팀을 방장에게 알린다
+function netSendTeam() {
+  if (NET.role !== 'guest') return;
+  const e = sel[1][0];
+  netSend({ t: 'team', i: e ? e.i : 0, pow: e ? e.pow : 1, wp: e ? e.wp : -1,
+            spd: e ? e.spd : 1, col: (e && e.col) || colB.value });
+}
+
+// ── 장면 보내기 (방장) ──
+const r1 = v => Math.round(v);
+function netSnapshot() {
+  const sd = [];
+  for (const s of G.sold) {
+    if (s.hp <= 0) continue;
+    sd.push([r1(s.x), r1(s.y), s.team, s.ti, WIDX[s.w.id] || 0,
+             r1(s.hp), r1(s.max), s.face, Math.round(s.swing * 100) / 100,
+             s.moving ? 1 : 0, Math.round(s.size * 100) / 100,
+             STYLES.indexOf(s.style), Math.round(s.ph * 10) / 10,
+             s.hurt > 0 ? 1 : 0]);
+  }
+  const pj = [];
+  for (const p of G.proj)
+    pj.push([r1(p.x), r1(p.y), r1(p.vx), r1(p.vy), WIDX[p.w.id] || 0, p.team]);
+  return {
+    t: 's', tm: Math.round(G.t * 10) / 10,
+    hp: [r1(BASE[0].hp), r1(BASE[1].hp)],
+    co: G.coin.slice(), ki: G.kills.slice(),
+    ov: G.over ? G.winner + 1 : 0,
+    rg: Math.round(G.rage * 100) / 100,
+    cam: [r1(G.cam.x), Math.round(G.cam.s * 1000) / 1000],
+    sd, pj
+  };
+}
+
+// ── 장면 받기 (참가자) ──
+function netApply(m) {
+  NET.prev = NET.snap; NET.snap = m;
+  NET.lastRecv = performance.now();
+  G.t = m.tm; G.rage = m.rg;
+  BASE[0].hp = m.hp[0]; BASE[1].hp = m.hp[1];
+  G.coin = m.co.slice(); G.kills = m.ki.slice();
+  G.over = m.ov > 0; G.winner = m.ov - 1;
+
+  const old = new Map();
+  for (const s of G.sold) old.set(s.key, s);
+  const next = [];
+  for (const a of m.sd) {
+    const [x, y, team, ti, wi, hp, max, face, swing, moving, size, st, ph, hurt] = a;
+    const key = team + ':' + ti + ':' + wi + ':' + r1(size * 100) + ':' + st;
+    // 같은 종류끼리 가까운 것을 이어 붙여 부드럽게 움직이게 한다
+    let best = null, bd = 1e9;
+    for (const [k, o] of old) {
+      if (k.split('|')[0] !== key || o.used) continue;
+      const d = Math.abs(o.x - x) + Math.abs(o.y - y);
+      if (d < bd) { bd = d; best = o; }
+    }
+    const td = (G.roster[team] && G.roster[team][ti]) || G.roster[0][0];
+    const w = WEAPONS[WKEYS[wi]] || WEAPONS.sword;
+    const o = (best && bd < 300) ? best : {
+      x, y, vx: 0, vy: 0, ground: true, cool: 0, think: 0, tgt: null,
+      cordy: -1, cordyTi: 0, chg: 0, chgHit: 0, slam: 0, slamX: 0, price: 1
+    };
+    o.used = true;
+    o.key = key + '|' + next.length;
+    o.tx = x; o.ty = y;
+    o.team = team; o.ti = ti; o.w = w; o.td = td;
+    o.col = (G.tcol[team] && G.tcol[team][ti]) || G.col[team];
+    o.style = STYLES[st] || 'stick';
+    o.size = size; o.hp = hp; o.max = max; o.face = face;
+    o.swing = swing; o.moving = !!moving; o.ph = ph;
+    o.hurt = hurt ? .15 : 0;
+    o.label = w.name;
+    if (best !== o) { o.x = o.x === undefined ? x : o.x; o.y = o.y === undefined ? y : o.y; }
+    next.push(o);
+  }
+  for (const o of next) o.used = false;
+  G.sold = next;
+
+  G.proj.length = 0;
+  for (const a of m.pj) {
+    const w = WEAPONS[WKEYS[a[4]]] || WEAPONS.bow;
+    G.proj.push({ x: a[0], y: a[1], vx: a[2], vy: a[3], w, team: a[5], ti: 0,
+                  dmg: w.dmg, aoe: w.aoe, arc: w.arc, life: 3, ang: Math.atan2(a[3], a[2]) });
+  }
+  G.cam.x = m.cam[0];
+  if (!G.camLock) G.cam.s = m.cam[1];
+}
+
+// 받은 위치로 부드럽게 따라간다
+function netLerp(dt) {
+  const k = Math.min(1, dt * 16);
+  for (const s of G.sold) {
+    if (s.tx === undefined) continue;
+    s.x += (s.tx - s.x) * k;
+    s.y += (s.ty - s.y) * k;
+    if (s.moving) s.ph += dt * 10;
+    if (s.swing > 0) s.swing = Math.max(0, s.swing - dt * 4.5);
+    if (s.hurt > 0) s.hurt -= dt;
+  }
+  for (const p of G.proj) { p.x += p.vx * dt; p.y += p.vy * dt; }
+}
+
+// 참가자는 시뮬레이션을 안 돌리니 불꽃·숫자·충격파만 따로 늙힌다
+function stepFx(dt) {
+  for (let i = G.part.length - 1; i >= 0; i--) {
+    const p = G.part[i];
+    p.vy += GRAV_W * .5 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
+    if (p.life <= 0) G.part.splice(i, 1);
+  }
+  for (let i = G.pops.length - 1; i >= 0; i--) {
+    G.pops[i].y -= dt * 22; G.pops[i].life -= dt;
+    if (G.pops[i].life <= 0) G.pops.splice(i, 1);
+  }
+  for (let i = G.nums.length - 1; i >= 0; i--) {
+    const n = G.nums[i];
+    n.x += n.vx * dt; n.y += n.vy * dt; n.vy += 190 * dt; n.life -= dt;
+    if (n.life <= 0) G.nums.splice(i, 1);
+  }
+  for (let i = G.shock.length - 1; i >= 0; i--) {
+    const k = G.shock[i]; k.r += 2700 * dt; k.life -= dt * .85;
+    if (k.life <= 0) G.shock.splice(i, 1);
+  }
+  for (let i = G.corp.length - 1; i >= 0; i--) {
+    const c = G.corp[i]; c.life -= dt;
+    if (c.life <= 0) G.corp.splice(i, 1);
+  }
+  if (G.flash > 0) G.flash = Math.max(0, G.flash - dt * 1.7);
+}
+
+function netRecv(m) {
+  if (m.t === 'team' && NET.role === 'host') {           // 참가자가 고른 팀
+    NET.peerTeam = m.i; NET.peerCol = m.col;
+    sel[1] = [{ i: m.i, pow: m.pow, wp: m.wp, spd: m.spd, col: m.col }];
+    colB.value = m.col; refresh('B');
+  } else if (m.t === 'buy' && NET.role === 'host') {     // 참가자가 병사를 샀다
+    const list = hireList(1);
+    buy(1, list[m.i]);
+  } else if (m.t === 'go' && NET.role === 'guest') {     // 방장이 시작했다
+    netStartAsGuest(m);
+  } else if (m.t === 's' && NET.role === 'guest') {
+    netApply(m);
+  } else if (m.t === 'end' && NET.role === 'guest') {
+    G.over = true; G.winner = m.w;
+  }
+}
+
+// 방장이 보낸 설정으로 참가자도 같은 판을 차린다
+function netStartAsGuest(m) {
+  MODE = 'hire'; CTRL = ['human', 'human'];
+  sel[0] = [m.a]; sel[1] = [m.b];
+  colA.value = m.ca; colB.value = m.cb;
+  COIN_START = m.coin; COIN_EVERY = m.every; KILL_W = m.w;
+  startGame(true);
+  NET.started = true;
+}
 
 /* ============================================================
    고용 모드 — 코인으로 병사를 산다
@@ -3006,16 +3374,21 @@ function hireList(t) {                      // 그 진영이 살 수 있는 것�
   T.basics.forEach((id, i) => {
     if (lock >= 0 && lock !== i) return;     // 무기를 고정했으면 그것만 판다
     const w = WEAPONS[id];
-    if (w) out.push({ kind: 'w', name: w.name, price: wPrice(w), w, i });
+    if (w) out.push({ kind: 'w', name: w.name, price: wPrice(w), w, i, idx: out.length });
   });
   T.shop.forEach((u, i) => {
     const w = WEAPONS[u.w];
-    if (w) out.push({ kind: 's', name: u.name, price: uPrice(u), w, u, i });
+    if (w) out.push({ kind: 's', name: u.name, price: uPrice(u), w, u, i, idx: out.length });
   });
   return out;
 }
 
 function buy(t, it) {
+  if (NET.on && NET.role === 'guest') {               // 참가자는 방장에게 요청만 한다
+    if (t !== 1 || !it || G.coin[1] < it.price) return false;
+    netSend({ t: 'buy', i: it.idx });
+    return true;
+  }
   if (G.over || !it || G.coin[t] < it.price) return false;
   let n = 0; for (const s of G.sold) if (s.team === t) n++;
   if (n >= MAX_SOLD) return false;
@@ -3040,9 +3413,11 @@ function buildHirePanel() {
                   '<span class="hcoin" id="coin' + t + '">0</span>';
     const sub = document.createElement('div');
     sub.className = 'hsub';
-    sub.textContent = CTRL[t] === 'human' ? '눌러서 병사를 산다' : 'AI가 알아서 산다';
+    const mine = !NET.on || (NET.role === 'host' ? t === 0 : t === 1);
+    sub.textContent = !mine ? '상대 진영'
+      : CTRL[t] === 'human' ? '눌러서 병사를 산다' : 'AI가 알아서 산다';
     p.append(h, sub);
-    if (CTRL[t] === 'human') {
+    if (CTRL[t] === 'human' && mine) {
       const g = document.createElement('div');
       g.className = 'hbtns';
       for (const it of hireList(t)) {
@@ -3058,7 +3433,7 @@ function buildHirePanel() {
       p.appendChild(g);
     } else {
       const a = document.createElement('div');
-      a.className = 'hai'; a.textContent = '자동 운영 중';
+      a.className = 'hai'; a.textContent = mine ? '자동 운영 중' : '상대가 고르는 중';
       p.appendChild(a);
     }
     box.appendChild(p);
@@ -3081,6 +3456,7 @@ function stepHire(dt) {
     for (let t = 0; t < 2; t++) { G.coin[t]++; G.earn[t]++; }
   }
   for (let t = 0; t < 2; t++) {
+    if (NET.on) break;                      // 온라인은 둘 다 사람이다
     if (CTRL[t] !== 'ai') continue;
     G.aiT[t] -= dt;
     if (G.aiT[t] > 0) continue;
@@ -3114,11 +3490,19 @@ function step(dt) {
 let last = performance.now(), acc = 0;
 function frame(now) {
   const raw = Math.min(.06, (now - last) / 1000); last = now;
-  if (G.roster[0].length && !G.over) {
+  const guest = NET.on && NET.role === 'guest' && NET.started;
+  if (guest) {
+    netLerp(raw);                                    // 받은 위치로 부드럽게 따라간다
+    stepFx(raw);                                     // 불꽃·숫자 같은 건 각자 돌린다
+  } else if (G.roster[0].length && !G.over) {
     acc += raw * G.speed;
     let n = 0;
     while (acc >= 1 / 60 && n < 14) { step(1 / 60); acc -= 1 / 60; n++; }
     if (acc > .5) acc = 0;
+    if (NET.on && NET.role === 'host' && NET.ready && NET.started) {
+      NET.sendT += raw;
+      if (NET.sendT >= NET.rate) { NET.sendT = 0; netSend(netSnapshot()); }
+    }
   }
   if (G.roster[0].length && document.getElementById('game').style.display !== 'none') {
     updateCam(raw);
