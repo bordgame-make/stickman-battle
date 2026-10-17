@@ -80,6 +80,9 @@ input.pdot:hover{border-color:var(--hi)}
 .tm .hbar{height:5px;background:#0a0e13;border-radius:3px;overflow:hidden}
 .tm .hbar i{display:block;height:100%;transition:width .18s}
 .tm .ts{font-size:11px;color:var(--dim);margin-top:5px}
+.tm .sbar{height:4px;background:#0a0e13;border-radius:3px;overflow:hidden;margin-top:3px;display:none}
+.tm .sbar i{display:block;height:100%;background:#7fd8ff;transition:width .18s}
+.tm .sbar.full i{background:#ffd76a}
 .grow{flex:1}
 .spd{display:flex;gap:5px}
 .spd button,.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
@@ -288,13 +291,19 @@ input.pdot:hover{border-color:var(--hi)}
     <div class="row">
       <label for="hpRange">베이스 체력</label>
       <input type="range" id="hpRange" min="300" max="10000" step="100" value="2000">
-      <b id="hpVal">2,000</b>
+      <input type="number" id="hpNum" min="100" step="100" value="2000" style="flex:0 0 112px">
     </div>
     <div class="presets">
       <button data-hp="600">순삭 600</button>
       <button data-hp="2000">기본 2,000</button>
       <button data-hp="5000">공성전 5,000</button>
       <button data-hp="10000">장기전 10,000</button>
+    </div>
+    <div class="presets" id="hpBig" style="display:none">
+      <button data-hp="50000">5만</button>
+      <button data-hp="300000">30만</button>
+      <button data-hp="2000000">200만</button>
+      <button data-hp="20000000">2,000만</button>
     </div>
     <div class="row simonly" style="margin-top:16px">
       <label for="ivRange">공 나오는 간격</label>
@@ -417,8 +426,10 @@ input.pdot:hover{border-color:var(--hi)}
 
 <div id="game">
   <div id="bar">
-    <div class="tm"><div class="tn" id="nmA">-</div><div class="hbar"><i id="hpA" style="width:100%"></i></div><div class="ts" id="stA">병사 0 · 베이스 0</div></div>
-    <div class="tm"><div class="tn" id="nmB">-</div><div class="hbar"><i id="hpB" style="width:100%"></i></div><div class="ts" id="stB">병사 0 · 베이스 0</div></div>
+    <div class="tm"><div class="tn" id="nmA">-</div><div class="hbar"><i id="hpA" style="width:100%"></i></div>
+      <div class="sbar" id="sbA"><i style="width:0%"></i></div><div class="ts" id="stA">병사 0 · 베이스 0</div></div>
+    <div class="tm"><div class="tn" id="nmB">-</div><div class="hbar"><i id="hpB" style="width:100%"></i></div>
+      <div class="sbar" id="sbB"><i style="width:0%"></i></div><div class="ts" id="stB">병사 0 · 베이스 0</div></div>
     <div class="grow"></div>
     <div class="spd">
       <button data-s="0">일시정지</button>
@@ -2782,6 +2793,16 @@ function drawField() {
     const bw = 132, r = Math.max(0, b.hp / b.max);
     fx.fillStyle = 'rgba(0,0,0,.6)'; fx.fillRect(b.x - bw / 2, GROUND - b.h - 52, bw, 9);
     fx.fillStyle = col; fx.fillRect(b.x - bw / 2, GROUND - b.h - 52, bw * r, 9);
+    // 연구 막대 — 진화에서 다음 시대까지 얼마나 남았는지
+    if (MODE === 'evo' && G.eras[t] && G.era[t] < G.eras[t].length - 1) {
+      const sr = clamp(G.study[t] / STUDY_NEED, 0, 1), sy = GROUND - b.h - 64;
+      fx.fillStyle = 'rgba(0,0,0,.6)'; fx.fillRect(b.x - bw / 2, sy, bw, 7);
+      fx.fillStyle = sr >= .999 ? '#ffd76a' : '#7fd8ff';
+      fx.fillRect(b.x - bw / 2, sy, bw * sr, 7);
+      fx.fillStyle = '#9fb0c4'; fx.font = '700 9px system-ui'; fx.textAlign = 'center';
+      fx.fillText('연구 ' + G.study[t] + '/' + STUDY_NEED + ' → ' +
+                  TEAMS[G.eras[t][G.era[t] + 1].i].name, b.x, sy - 4);
+    }
     if (G.invin[t]) {                       // 표적 — 누적 피해를 머리 위에 띄운다
       fx.fillStyle = '#c8d2de'; fx.font = '800 20px system-ui'; fx.textAlign = 'center';
       fx.fillText('받은 피해 ' + Math.round(G.dealt[t]).toLocaleString(), b.x, GROUND - b.h - 68);
@@ -3419,6 +3440,7 @@ function setMode(m) {
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
   document.getElementById('hireOpts').style.display = m === 'hire' ? 'block' : 'none';
   document.getElementById('evoOpts').style.display  = m === 'evo'  ? 'block' : 'none';
+  document.getElementById('hpBig').style.display    = m === 'evo'  ? 'flex' : 'none';
   document.querySelectorAll('.simonly').forEach(e => e.style.display = m === 'hire' ? 'none' : '');
   syncForm();
   document.getElementById('subTxt').textContent =
@@ -3492,9 +3514,16 @@ colA.oninput = () => { syncDots(); refresh('A'); };
 colB.oninput = () => { syncDots(); refresh('B'); };
 syncDots();
 
-const hpRange = document.getElementById('hpRange'), hpVal = document.getElementById('hpVal');
-function syncHp() { hpVal.textContent = Number(hpRange.value).toLocaleString(); }
-hpRange.oninput = syncHp; syncHp();
+const hpRange = document.getElementById('hpRange'), hpNum = document.getElementById('hpNum');
+// 막대는 흔히 쓰는 범위, 숫자 칸은 얼마든지. 둘은 서로 맞춰 움직인다.
+const baseHp = () => clamp(Math.round(+hpNum.value) || 2000, 100, 100000000);
+function syncHp(from) {
+  if (from === 'num') hpRange.value = clamp(baseHp(), +hpRange.min, +hpRange.max);
+  else hpNum.value = hpRange.value;
+}
+hpRange.oninput = () => syncHp('range');
+hpNum.oninput = () => syncHp('num');
+syncHp('range');
 const ivRange = document.getElementById('ivRange'), ivVal = document.getElementById('ivVal');
 function syncIv() { ivVal.textContent = ivRange.value + '초'; }
 ivRange.oninput = syncIv; syncIv();
@@ -3536,7 +3565,7 @@ document.querySelectorAll('.presets button').forEach(b => b.onclick = () => {
   if (b.dataset.sold) { INF.sold = false; soldNum.value = b.dataset.sold; syncInf(); }
   if (b.dataset.shp) { shpRange.value = b.dataset.shp; syncShp(); }
   if (b.dataset.sz) { szRange.value = b.dataset.sz; syncSz(); }
-  if (b.dataset.hp) { hpRange.value = b.dataset.hp; syncHp(); }
+  if (b.dataset.hp) { hpNum.value = b.dataset.hp; syncHp('num'); }
   if (b.dataset.iv) { ivRange.value = b.dataset.iv; syncIv(); }
   if (b.dataset.nuke !== undefined) { nukeRange.value = b.dataset.nuke; syncNuke(); }
   if (b.dataset.ctl) {
@@ -3637,7 +3666,7 @@ function startGame(asGuest) {
   G.coin = [COIN_START, COIN_START]; G.incT = 0; G.aiT = [0, 0]; G.earn = [COIN_START, COIN_START];
   G.t = 0; G.spawnT = SPAWN_EVERY; G.over = false; G.winner = -1; G.rage = 1;
   G.speed = 1; G.cam.x = WORLD_W / 2; G.cam.s = .8;
-  const startHp = clamp(parseInt(hpRange.value, 10) || 2000, 300, 10000);
+  const startHp = baseHp();
   NUKE_HP = clamp(parseInt(nukeRange.value, 10) || 0, 0, startHp - 1);
   for (let t = 0; t < 2; t++) {
     const b = BASE[t];
@@ -4329,14 +4358,23 @@ function frame(now) {
         (MODE === 'hire' ? ' · 코인 ' + G.coin[t] : '') +
         (MODE === 'evo'
           ? ' · ' + (G.era[t] + 1) + '/' + (G.eras[t] ? G.eras[t].length : 1) + '시대' +
-            (G.eras[t] && G.era[t] < G.eras[t].length - 1
-              ? ' (연구 ' + G.study[t] + '/' + STUDY_NEED + ')' : ' 최종')
+            (G.eras[t] && G.era[t] < G.eras[t].length - 1 ? '' : ' 최종')
           : '') +
-        ' · 베이스 ' + Math.max(0, Math.round(BASE[t].hp)) + rg;
+        ' · 베이스 ' + Math.max(0, Math.round(BASE[t].hp)).toLocaleString() + rg;
     document.getElementById('stA').textContent = line(0, a);
     document.getElementById('stB').textContent = line(1, b);
     document.getElementById('hpA').style.width = (G.invin[0] ? 100 : Math.max(0, BASE[0].hp / BASE[0].max * 100)) + '%';
     document.getElementById('hpB').style.width = (G.invin[1] ? 100 : Math.max(0, BASE[1].hp / BASE[1].max * 100)) + '%';
+    for (let t = 0; t < 2; t++) {                      // 연구 막대
+      const sb = document.getElementById('sb' + (t ? 'B' : 'A'));
+      const last = !G.eras[t] || G.era[t] >= G.eras[t].length - 1;
+      if (MODE !== 'evo' || last) { sb.style.display = 'none'; continue; }
+      sb.style.display = 'block';
+      const r = clamp(G.study[t] / STUDY_NEED, 0, 1);
+      sb.firstElementChild.style.width = (r * 100) + '%';
+      sb.classList.toggle('full', r >= .999);
+      sb.title = '연구 ' + G.study[t] + '/' + STUDY_NEED;
+    }
     if (G.over) {
       const o = document.getElementById('over');
       if (o.style.display !== 'flex') {
