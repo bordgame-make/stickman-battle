@@ -45,6 +45,12 @@ h1 span{color:var(--hi)}
 .wsel:hover{border-color:#4a5a6e}
 .wsel.lock{border-color:var(--hi);color:var(--hi)}
 .wtag{flex:0 0 46px;font-size:10px;color:var(--dim)}
+.ord{display:flex;flex-direction:column;gap:1px;flex:0 0 14px}
+.ord button{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:3px;
+  font-size:8px;line-height:1;padding:1px 0;cursor:pointer;font-family:inherit}
+.ord button:hover:not(:disabled){border-color:var(--hi);color:var(--ink)}
+.ord button:disabled{opacity:.25;cursor:default}
+.eratag{flex:0 0 34px;font-size:10px;font-weight:800;color:var(--hi)}
 .prow2 input[type=range]{flex:1;min-width:50px;accent-color:var(--hi);height:3px}
 .prow2 b{flex:0 0 40px;text-align:right;color:var(--hi);font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
 .pdot{width:9px;height:9px;border-radius:50%;flex:0 0 9px}
@@ -151,6 +157,7 @@ input.pdot:hover{border-color:var(--hi)}
   <div class="tabs">
     <button class="tab on" data-mode="sim">시뮬레이션</button>
     <button class="tab" data-mode="hire">고용</button>
+    <button class="tab" data-mode="evo">진화</button>
   </div>
 
   <div class="picks">
@@ -169,6 +176,24 @@ input.pdot:hover{border-color:var(--hi)}
         <button class="mini" data-all="B">전부</button><button class="mini" data-none="B">해제</button></div>
       <div class="detail" id="detB">팀을 고르면 무기와 상점 병사가 여기 나온다.</div>
     </div>
+  </div>
+
+  <div class="opts" id="evoOpts" style="display:none">
+    <div class="row">
+      <label for="stRange">STUDY 필요 개수</label>
+      <input type="range" id="stRange" min="1" max="40" step="1" value="8">
+      <b id="stVal">8개</b>
+    </div>
+    <div class="presets">
+      <button data-st="3">3개 (빠름)</button>
+      <button data-st="8">기본 8개</button>
+      <button data-st="16">16개</button>
+      <button data-st="30">30개 (느림)</button>
+    </div>
+    <div class="hint">BALL DROP에 <b>STUDY</b> 칸이 생긴다. 공이 거기 빠질 때마다 연구가 쌓이고, 정한 개수를 채우면 다음 시대로 넘어간다.<br>
+    시대는 왼쪽·오른쪽 목록에서 고른 <b>순서대로</b> 간다. 개수 제한은 없다. 같은 팀을 여러 번 넣어도 되고, 양쪽 시대 수가 달라도 된다.<br>
+    시대가 바뀌면 그 진영의 병사·무기·상점·기지 모양이 통째로 바뀌고 기지가 조금 회복된다. 이미 전장에 나와 있던 옛 시대 병사는 그대로 싸운다.<br>
+    마지막 시대에 도달하면 STUDY 칸은 더 이상 아무 일도 하지 않는다.</div>
   </div>
 
   <div class="opts" id="hireOpts" style="display:none">
@@ -356,6 +381,7 @@ input.pdot:hover{border-color:var(--hi)}
   <div class="rules">
     <b>SPLIT</b> — 공이 두 개로 갈라져 다시 입구로 들어간다. 많이 맞을수록 병력 생산이 빨라진다.<br>
     <b>WEAPON</b> — 아래 무기 보드로 넘어가고, 바닥 선에 닿은 무기를 든 병사가 나온다.<br>
+    <b>STUDY</b> — 진화 대전에만 있다. 정한 개수만큼 채우면 다음 시대로 넘어가고 부대가 통째로 바뀐다.<br>
     <b>SHOP</b> — 상점 보드로 넘어간다. 칸마다 필요한 개수가 다르고, 다 채워야 강한 병사가 나온다. 필요 개수가 클수록 강하다.<br>
     <b>베이스</b> — 적이 다가오면 꼭대기에서 알아서 쏜다. 베이스 체력이 0이 되면 점령.<br>
     <b>고용 탭</b> — 공 대신 코인을 쓴다. 한 진영에 팀 하나, 옆 패널의 버튼으로 직접 사거나 AI에게 맡긴다. 사람끼리면 PvP, 한쪽만 사람이면 PvE, 둘 다 AI면 EvE다.<br>
@@ -409,6 +435,27 @@ function wp(id, name, type, dmg, range, cd, shape, o) {
 
 /* --- 근접 --- */
 wp('lance','기병창','m',34,66,1.05,'pole',{col:'#d8c48a',kn:1.6,dash:1.9,mv:1.6,mount:1});
+/* 석기시대 */
+wp('stoneaxe','돌도끼','m',24,42,1.05,'axe',{col:'#a89880'});
+wp('stonespear','돌창','m',21,66,1.05,'pole',{col:'#b0a088'});
+wp('torch','횃불','m',19,40,.85,'club',{col:'#ff9a4a'});
+wp('bonespear','뼈창','m',25,70,1.1,'pole',{col:'#e8e4d0'});
+/* 로마 */
+wp('gladius','글라디우스','m',25,44,.8,'blade',{col:'#e0d2a8'});
+wp('pilum','필룸','r',32,330,1.3,'arrow',{col:'#d8c48a',ps:470});
+wp('scutum','스쿠툼 밀치기','m',17,40,.9,'club',{col:'#c0392b',kn:2.6});
+wp('hasta','하스타','m',23,76,1.1,'pole',{col:'#d8c48a'});
+wp('ballista','발리스타','r',62,560,2.8,'arrow',{col:'#c8b68a',ps:620,kn:2.4});
+wp('legionspear','군단 창벽','m',30,80,1.2,'pole',{col:'#e0c060',kn:2});
+/* 미래 */
+wp('pulse','펄스 소총','r',22,420,.45,'bullet',{col:'#7fe8ff',ps:760});
+wp('gravgun','중력포','r',40,480,1.9,'ball',{col:'#c07aff',ps:420,aoe:120,kn:3.4});
+wp('nanoblade','나노 블레이드','m',38,48,.6,'blade',{col:'#9affd8'});
+wp('dronebee','드론 떼','r',16,400,.7,'shard',{col:'#8fd0ff',ps:620});
+wp('fusion','융합포','r',120,600,3.4,'ball',{col:'#ffe08a',ps:500,aoe:210,kn:4});
+wp('orbital','궤도 포격','r',180,680,5,'bomb',{col:'#ff9ad0',ps:360,arc:1,aoe:300,kn:5,cry:'궤도 포격!'});
+wp('mechfist','강화외골격 주먹','m',70,44,.75,'fist',{col:'#9ab4d8',kn:2.6});
+
 /* 융성망 */
 wp('ys500kick','융성망500t킥','m',150,74,1.25,'pole',{col:'#ff5a3c',kn:3.4,cry:'융성망 500t 킥!!'});
 wp('ys250punch','융성망250t펀치','m',82,50,.55,'club',{col:'#ff8a4a',kn:2.2});
@@ -682,87 +729,93 @@ function uPrice(u) {
   return Math.max(3, Math.round(u.cost * (w && w.type !== 'm' ? 1.3 : 1)));
 }
 
-function T(name, col, style, basics, shop) {
-  TEAMS.push({ name, col, style, basics,
+function T(name, col, style, basics, shop, base) {
+  TEAMS.push({ name, col, style, basics, base: base || 'keep',
     shop: shop.map(s => ({ name: s[0], cost: s[1], w: s[2], hp: s[3], dmg: s[4], size: s[5] })) });
 }
 
 T('현대 군대','#4a7c3f','armor',['rifle','pistol','shotgun','knife','grenade'],
-  [['중기관총병',8,'mg',1.8,1.5,1.15],['저격수',12,'sniper',1.2,3,1],['로켓병',18,'rpg',2,2.5,1.2],['전차병',28,'cannon',5,3,1.85]]);
+  [['중기관총병',8,'mg',1.8,1.5,1.15],['저격수',12,'sniper',1.2,3,1],['로켓병',18,'rpg',2,2.5,1.2],['전차병',28,'cannon',5,3,1.85]], 'bunker');
 T('중세 군대','#8a6b3a','armor',['sword','spear','bow','axe','dagger'],
-  [['기병',6,'lance',1.5,1.4,1.15],['석궁병',7,'crossbow',1.2,1.6,1],['기사',11,'greatsword',2.5,1.8,1.3],['미늘창병',16,'halberd',2.2,2.2,1.25],['성기사',27,'holyspear',5,3,1.75]]);
+  [['기병',6,'lance',1.5,1.4,1.15],['석궁병',7,'crossbow',1.2,1.6,1],['기사',11,'greatsword',2.5,1.8,1.3],['미늘창병',16,'halberd',2.2,2.2,1.25],['성기사',27,'holyspear',5,3,1.75]], 'castle');
 T('베놈','#3a2b4d','blob',['claw','tentacle','websh','bite','acidspit'],
-  [['심비오트',8,'shadowclaw',2,1.8,1.2],['독액포',13,'acidspit',1.6,2.4,1.1],['거대촉수',20,'tentacle',3.2,2.4,1.5],['베놈킹',30,'shadowclaw',6,3.2,2.05]]);
+  [['심비오트',8,'shadowclaw',2,1.8,1.2],['독액포',13,'acidspit',1.6,2.4,1.1],['거대촉수',20,'tentacle',3.2,2.4,1.5],['베놈킹',30,'shadowclaw',6,3.2,2.05]], 'organic');
 T('알 증식','#d9c47a','insect',['bite','sting','eggthrow','claw','pincer'],
-  [['알품은병사',6,'eggthrow',1.3,1.2,1],['여왕근위대',11,'pincer',2,1.8,1.3],['산란자',17,'eggthrow',2.4,1.6,1.4],['여왕',29,'sting',6,2.6,2.1]]);
+  [['알품은병사',6,'eggthrow',1.3,1.2,1],['여왕근위대',11,'pincer',2,1.8,1.3],['산란자',17,'eggthrow',2.4,1.6,1.4],['여왕',29,'sting',6,2.6,2.1]], 'hive');
 T('악마','#8b1e2d','demon',['fireball','claw','scythe','darkbolt','flameblade'],
-  [['임프',7,'fireball',1.2,1.5,.9],['헬나이트',14,'flameblade',2.6,2.2,1.3],['서큐버스',19,'darkbolt',2,2.6,1.2],['대악마',30,'meteor',6.5,3.5,2.2]]);
+  [['임프',7,'fireball',1.2,1.5,.9],['헬나이트',14,'flameblade',2.6,2.2,1.3],['서큐버스',19,'darkbolt',2,2.6,1.2],['대악마',30,'meteor',6.5,3.5,2.2]], 'hell');
 T('좀비','#6b7a4a','blob',['bite','claw','club','fist','boneclub'],
-  [['구울',6,'claw',1.6,1.3,1.05],['역병좀비',11,'poisoncloud',1.8,1.8,1.1],['탱크좀비',19,'fist',4,2,1.6],['좀비거인',28,'club',7,2.8,2.2]]);
+  [['구울',6,'claw',1.6,1.3,1.05],['역병좀비',11,'poisoncloud',1.8,1.8,1.1],['탱크좀비',19,'fist',4,2,1.6],['좀비거인',28,'club',7,2.8,2.2]], 'ruin');
 T('로봇','#7a8a99','robot',['laser','pistol','drill','fist','rifle'],
-  [['드론',7,'laser',1,1.6,.85],['전투로봇',13,'plasma',2.4,2,1.25],['레일건유닛',20,'railgun',2,3.2,1.3],['메카',30,'plasma',7,3.4,2.3]]);
+  [['드론',7,'laser',1,1.6,.85],['전투로봇',13,'plasma',2.4,2,1.25],['레일건유닛',20,'railgun',2,3.2,1.3],['메카',30,'plasma',7,3.4,2.3]], 'factory');
 T('바이킹','#4a6b8a','armor',['axe','sword','spear','javelin','club'],
-  [['투척병',7,'javelin',1.3,1.7,1],['광전사',10,'greatsword',2.2,2,1.25],['방패병',14,'axe',3.5,1.4,1.3],['요툰',28,'hammer',6.5,3,2.1]]);
+  [['투척병',7,'javelin',1.3,1.7,1],['광전사',10,'greatsword',2.2,2,1.25],['방패병',14,'axe',3.5,1.4,1.3],['요툰',28,'hammer',6.5,3,2.1]], 'hall');
 T('사무라이','#9a3b3b','armor',['katana','bow','spear','dagger','saber'],
-  [['낭인',8,'katana',1.8,1.8,1.05],['궁기병',12,'longbow',1.6,2,1.1],['대장',18,'greatsword',3,2.4,1.35],['쇼군',29,'katana',6,3.4,1.9]]);
+  [['낭인',8,'katana',1.8,1.8,1.05],['궁기병',12,'longbow',1.6,2,1.1],['대장',18,'greatsword',3,2.4,1.35],['쇼군',29,'katana',6,3.4,1.9]], 'pagoda');
 T('해적','#7a5a2a','stick',['cutlass','pistol','musket','dagger','bomb'],
-  [['화약통병',8,'dynamite',1.2,2.2,1],['포수',11,'cannon',1.6,2.6,1.1],['선원장',15,'cutlass',2.6,2,1.25],['선장',27,'revolver',5,3.2,1.8]]);
+  [['화약통병',8,'dynamite',1.2,2.2,1],['포수',11,'cannon',1.6,2.6,1.1],['선원장',15,'cutlass',2.6,2,1.25],['선장',27,'revolver',5,3.2,1.8]], 'ship');
 T('고대 이집트','#c8a33a','armor',['khopesh','spear','bow','sling','dagger'],
-  [['미라',9,'fist',2.6,1.4,1.15],['전차병',12,'javelin',2,2,1.2],['사제',16,'sandblast',1.6,2.4,1.1],['파라오',28,'holybolt',5.5,3.2,1.9]]);
+  [['미라',9,'fist',2.6,1.4,1.15],['전차병',12,'javelin',2,2,1.2],['사제',16,'sandblast',1.6,2.4,1.1],['파라오',28,'holybolt',5.5,3.2,1.9]], 'pyramid');
 T('스파르타','#9a2b2b','armor',['spear','sword','javelin','dagger','club'],
-  [['투척병',7,'javelin',1.4,1.8,1],['중장보병',10,'spear',3,1.8,1.2],['정예창병',15,'halberd',3,2.2,1.3],['왕',28,'greatsword',6,3.2,1.9]]);
+  [['투척병',7,'javelin',1.4,1.8,1],['중장보병',10,'spear',3,1.8,1.2],['정예창병',15,'halberd',3,2.2,1.3],['왕',28,'greatsword',6,3.2,1.9]], 'fort');
 T('닌자','#3a3a4a','stick',['kunai','shuriken','katana','dagger','blowdart'],
-  [['암살자',9,'dagger',1.2,3,.95],['수리검마스터',12,'shuriken',1.4,2.2,1.05],['그림자닌자',18,'katana',2.4,2.6,1.15],['두목',27,'shadowclaw',5,3.4,1.8]]);
+  [['암살자',9,'dagger',1.2,3,.95],['수리검마스터',12,'shuriken',1.4,2.2,1.05],['그림자닌자',18,'katana',2.4,2.6,1.15],['두목',27,'shadowclaw',5,3.4,1.8]], 'pagoda');
 T('외계인','#5ac48a','blob',['laser','plasma','acidspit','claw','sonicwave'],
-  [['정찰병',7,'laser',1.2,1.6,.9],['중력포',14,'plasma',2,2.4,1.2],['변이체',19,'tentacle',3,2.2,1.4],['모선수호자',30,'railgun',6.5,3.4,2.2]]);
+  [['정찰병',7,'laser',1.2,1.6,.9],['중력포',14,'plasma',2,2.4,1.2],['변이체',19,'tentacle',3,2.2,1.4],['모선수호자',30,'railgun',6.5,3.4,2.2]], 'ufo');
 T('곤충 군단','#7a8a2a','insect',['pincer','sting','bite','acidspit','claw'],
-  [['병정개미',6,'pincer',1.6,1.4,1],['말벌',10,'sting',1.2,2.2,.95],['사마귀',16,'claw',2.4,2.4,1.3],['거대여왕',29,'sting',6.5,3,2.2]]);
+  [['병정개미',6,'pincer',1.6,1.4,1],['말벌',10,'sting',1.2,2.2,.95],['사마귀',16,'claw',2.4,2.4,1.3],['거대여왕',29,'sting',6.5,3,2.2]], 'hive');
 T('슬라임','#4ab8c8','blob',['fist','acidspit','bite','tentacle','club'],
-  [['산성슬라임',7,'acidspit',1.6,1.6,1.05],['분열체',10,'tentacle',2,1.8,1.15],['강철슬라임',14,'fist',3.4,1.6,1.3],['슬라임킹',28,'fist',8,2.6,2.35]]);
+  [['산성슬라임',7,'acidspit',1.6,1.6,1.05],['분열체',10,'tentacle',2,1.8,1.15],['강철슬라임',14,'fist',3.4,1.6,1.3],['슬라임킹',28,'fist',8,2.6,2.35]], 'organic');
 T('얼음 왕국','#6ab0d8','armor',['icesword','iceshard','spear','bow','club'],
-  [['얼음궁수',9,'longbow',1.4,1.8,1.05],['서리기사',12,'icesword',2.6,2,1.25],['빙결술사',16,'iceshard',1.6,2.6,1.1],['프로스트타이탄',29,'hammer',7,3,2.2]]);
+  [['얼음궁수',9,'longbow',1.4,1.8,1.05],['서리기사',12,'icesword',2.6,2,1.25],['빙결술사',16,'iceshard',1.6,2.6,1.1],['프로스트타이탄',29,'hammer',7,3,2.2]], 'ice');
 T('화염 군단','#d8642a','demon',['flameblade','fireball','firearrow','club','flamethrower'],
-  [['화염병',8,'flamethrower',1.6,2,1.1],['용암기사',14,'flameblade',2.8,2.2,1.3],['불꽃술사',18,'meteor',1.8,2.8,1.1],['이프리트',30,'meteor',6.5,3.4,2.15]]);
+  [['화염병',8,'flamethrower',1.6,2,1.1],['용암기사',14,'flameblade',2.8,2.2,1.3],['불꽃술사',18,'meteor',1.8,2.8,1.1],['이프리트',30,'meteor',6.5,3.4,2.15]], 'hell');
 T('해골단','#b8b8a8','skeleton',['boneclub','sword','bow','scythe','dagger'],
-  [['해골궁수',7,'longbow',1.2,1.6,1],['해골기사',11,'greatsword',2.4,1.8,1.2],['사령술사',17,'darkbolt',1.8,2.4,1.1],['본드래곤',29,'bloodbolt',6.5,3.2,2.2]]);
+  [['해골궁수',7,'longbow',1.2,1.6,1],['해골기사',11,'greatsword',2.4,1.8,1.2],['사령술사',17,'darkbolt',1.8,2.4,1.1],['본드래곤',29,'bloodbolt',6.5,3.2,2.2]], 'ruin');
 T('마법사','#6a4ac8','stick',['fireball','iceshard','lightning','club','darkbolt'],
-  [['화염술사',9,'fireball',1.2,2.2,1],['뇌전술사',14,'lightning',1.4,2.8,1.05],['대마법사',20,'meteor',2,3.2,1.2],['아크메이지',30,'meteor',5,4,1.9]]);
+  [['화염술사',9,'fireball',1.2,2.2,1],['뇌전술사',14,'lightning',1.4,2.8,1.05],['대마법사',20,'meteor',2,3.2,1.2],['아크메이지',30,'meteor',5,4,1.9]], 'tower');
 T('공룡','#5a8a4a','beast',['bite','claw','fang','whip','fist'],
-  [['랩터',8,'claw',1.4,1.8,1.05],['프테라노돈',12,'bite',1.4,2,1.1],['트리케라톱스',17,'fist',4,2,1.5],['티라노',30,'bite',8,3.4,2.4]]);
+  [['랩터',8,'claw',1.4,1.8,1.05],['프테라노돈',12,'bite',1.4,2,1.1],['트리케라톱스',17,'fist',4,2,1.5],['티라노',30,'bite',8,3.4,2.4]], 'cave');
 T('흡혈귀','#7a1e3d','demon',['bite','claw','bloodbolt','saber','dagger'],
-  [['박쥐무리',7,'bite',1.2,1.6,.9],['피의기사',13,'saber',2.6,2.2,1.2],['혈마법사',17,'bloodbolt',1.8,2.8,1.1],['진조',29,'bloodbolt',6,3.4,2]]);
+  [['박쥐무리',7,'bite',1.2,1.6,.9],['피의기사',13,'saber',2.6,2.2,1.2],['혈마법사',17,'bloodbolt',1.8,2.8,1.1],['진조',29,'bloodbolt',6,3.4,2]], 'castle');
 T('늑대인간','#6a5a3a','beast',['wolfclaw','bite','claw','club','fang'],
-  [['알파늑대',9,'wolfclaw',2,1.8,1.2],['야수전사',14,'claw',2.8,2.2,1.3],['광폭늑대',18,'bite',3,2.6,1.35],['월광군주',29,'wolfclaw',6.5,3.4,2.1]]);
+  [['알파늑대',9,'wolfclaw',2,1.8,1.2],['야수전사',14,'claw',2.8,2.2,1.3],['광폭늑대',18,'bite',3,2.6,1.35],['월광군주',29,'wolfclaw',6.5,3.4,2.1]], 'cave');
 T('천사','#e0d8a8','winged',['holyspear','holybolt','sword','bow','spear'],
-  [['빛의궁수',8,'holybolt',1.4,2,1.05],['수호천사',11,'holyspear',2.8,1.8,1.2],['대천사',20,'holybolt',3,3,1.4],['세라핌',30,'holybolt',6.5,3.6,2.1]]);
+  [['빛의궁수',8,'holybolt',1.4,2,1.05],['수호천사',11,'holyspear',2.8,1.8,1.2],['대천사',20,'holybolt',3,3,1.4],['세라핌',30,'holybolt',6.5,3.6,2.1]], 'temple');
 T('사이보그','#8a9ab8','robot',['laser','plasma','steamfist','pistol','drill'],
-  [['강화보병',9,'rifle',2,1.8,1.1],['레이저병',13,'laser',1.8,2.4,1.1],['중장갑',19,'railgun',4,2.4,1.5],['프로토타입',30,'plasma',7,3.4,2.2]]);
+  [['강화보병',9,'rifle',2,1.8,1.1],['레이저병',13,'laser',1.8,2.4,1.1],['중장갑',19,'railgun',4,2.4,1.5],['프로토타입',30,'plasma',7,3.4,2.2]], 'factory');
 T('버섯 포자','#c07ac8','mushroom',['sporepunch','sporeburst','poisoncloud','club','bite'],
-  [['포자병',7,'sporeburst',1.4,1.6,1],['독버섯',12,'poisoncloud',1.8,2.2,1.15],['거대균사',18,'vinewhip',3,2.2,1.4],['모균체',29,'sporeburst',7,3,2.2]]);
+  [['포자병',7,'sporeburst',1.4,1.6,1],['독버섯',12,'poisoncloud',1.8,2.2,1.15],['거대균사',18,'vinewhip',3,2.2,1.4],['모균체',29,'sporeburst',7,3,2.2]], 'mushroom');
 T('스팀펑크','#a87a3a','robot',['steamfist','musket','drill','revolver','pickaxe'],
-  [['증기병',9,'steamfist',2.2,1.8,1.15],['개틀링',14,'mg',1.8,2.4,1.2],['비행정',18,'bomb',2,2.6,1.2],['강철거인',30,'steamfist',7,3.2,2.3]]);
+  [['증기병',9,'steamfist',2.2,1.8,1.15],['개틀링',14,'mg',1.8,2.4,1.2],['비행정',18,'bomb',2,2.6,1.2],['강철거인',30,'steamfist',7,3.2,2.3]], 'factory');
 T('카우보이','#c89a5a','stick',['revolver','rifle','dynamite','knife','club'],
-  [['명사수',9,'revolver',1.2,2.4,1],['산탄총잡이',12,'shotgun',1.8,2.2,1.1],['다이너마이트',15,'dynamite',1.6,2.6,1.05],['보안관',27,'sniper',5,3.4,1.8]]);
+  [['명사수',9,'revolver',1.2,2.4,1],['산탄총잡이',12,'shotgun',1.8,2.2,1.1],['다이너마이트',15,'dynamite',1.6,2.6,1.05],['보안관',27,'sniper',5,3.4,1.8]], 'saloon');
 T('아즈텍','#3a8a7a','stick',['macuahuitl','ritualknife','sling','spear','club'],
-  [['재규어전사',10,'macuahuitl',2.4,2,1.2],['독수리전사',12,'javelin',1.8,2,1.15],['사제',16,'darkbolt',1.8,2.6,1.1],['전쟁신',29,'macuahuitl',6.5,3.4,2.1]]);
+  [['재규어전사',10,'macuahuitl',2.4,2,1.2],['독수리전사',12,'javelin',1.8,2,1.15],['사제',16,'darkbolt',1.8,2.6,1.1],['전쟁신',29,'macuahuitl',6.5,3.4,2.1]], 'pyramid');
 T('심해 괴물','#2a5a8a','blob',['tentacle','harpoon','inkshot','bite','claw'],
-  [['작살병',9,'harpoon',1.6,2,1.05],['크라켄새끼',11,'tentacle',2,1.8,1.15],['심해아귀',17,'bite',3.2,2.4,1.4],['리바이어던',30,'inkshot',7,3.4,2.3]]);
+  [['작살병',9,'harpoon',1.6,2,1.05],['크라켄새끼',11,'tentacle',2,1.8,1.15],['심해아귀',17,'bite',3.2,2.4,1.4],['리바이어던',30,'inkshot',7,3.4,2.3]], 'organic');
 
 T('사이언스버섯포자','#6ad8d0','mushroom',['emc2','formula','needle','nofric','cern'],
   [['FAT MAN',3,'fatman',2.6,1,1.5],['LITTLE BOY',2,'littleboy',2.2,1,1.3],
-   ['TSAR BOMBA',5,'tsar',3.4,1,1.8],['생화학맨',5,'bioman',3.2,1,1.6]]);
+   ['TSAR BOMBA',5,'tsar',3.4,1,1.8],['생화학맨',5,'bioman',3.2,1,1.6]], 'mushroom');
 
 T('악마의 쿡','#d84a4a','chef',['poopdish','poopsmell','hot1000','ice0k','yumdish'],
   [['얼티밋 요리사',3,'ultichef',3,1,1.5],['종합 수프 요리사',7,'souppot',3.5,1,1.6],
-   ['요리총',3,'foodgun',2,.28,1.2],['요리진격',4,'marchcook',2.6,.7,1.35]]);
+   ['요리총',3,'foodgun',2,.28,1.2],['요리진격',4,'marchcook',2.6,.7,1.35]], 'kitchen');
 
 T('미슐랭 쿸','#e0b040','chef',['panSmash','tableware','mheal','panThrow','salad'],
   [['바닥 끓이기',4,'boilfloor',2.6,1,1.4],['후라이팬돌진',4,'panDash',3,1,1.4],
-   ['라따뚜이',5,'ratatouille',3,1,1.5],['미슐랭쓰리스타',7,'mstar',3.4,1,1.7]]);
+   ['라따뚜이',5,'ratatouille',3,1,1.5],['미슐랭쓰리스타',7,'mstar',3.4,1,1.7]], 'kitchen');
 
+T('석기시대 군대','#9a7b4f','beast',['stoneaxe','club','stonespear','torch','sling'],
+  [['사냥꾼',5,'bonespear',1.3,1.4,1.1],['불잡이',8,'torch',1.5,1.6,1.15],['거인',14,'boneclub',3,2,1.5],['매머드 기수',24,'bonespear',5,2.8,1.9]], 'cave');
+T('로마 군대','#c8a24a','armor',['gladius','pilum','scutum','hasta','bow'],
+  [['군단병',6,'gladius',1.6,1.5,1.1],['투창병',9,'pilum',1.4,1.8,1.05],['백인대장',15,'legionspear',2.8,2.2,1.3],['발리스타대',26,'ballista',3.4,3,1.7]], 'fort');
+T('미래 군대','#5ad8e0','robot',['pulse','nanoblade','dronebee','gravgun','laser'],
+  [['강화보병',7,'mechfist',1.8,1.6,1.2],['드론 운용병',11,'dronebee',1.4,2,1.05],['융합포병',18,'fusion',2.2,2.4,1.3],['궤도 사령관',28,'orbital',5,3.2,1.9]], 'tower');
 T('융성망','#ff3a5a','ys',['ys500kick','ys250punch','ysl6','ysslam','yscharge'],
-  [['융성망1000t킥',9,'ys1000kick',2.6,2.2,1.45],['L12 형만믿어!!!',16,'ysl12',3,2,1.3],['130kg 내려찍기!!!',22,'ysslam2',4,2.6,1.7],['융성망 그 자체',30,'ysfinal',7,3.4,2.2]]);
-T('도전 모드','#6c7684','stick',[],[]);
+  [['융성망1000t킥',9,'ys1000kick',2.6,2.2,1.45],['L12 형만믿어!!!',16,'ysl12',3,2,1.3],['130kg 내려찍기!!!',22,'ysslam2',4,2.6,1.7],['융성망 그 자체',30,'ysfinal',7,3.4,2.2]], 'hall');
+T('도전 모드','#6c7684','stick',[],[], 'keep');
 // 무기도 상점도 없고 베이스가 부서지지 않는다. 얼마나 때릴 수 있는지 재보는 표적.
 TEAMS.find(t => t.name === '도전 모드').invincible = true;
 
@@ -799,13 +852,15 @@ const G = {
   wlock: [[], []],             // [진영][팀] = -1이면 전부, 아니면 그 무기 하나만
   rspd: [[], []],              // [진영][팀] 돌진 속도 배율
   coin: [0, 0], incT: 0, aiT: [0, 0], earn: [0, 0],   // 고용 모드
+  eras: [[], []], era: [0, 0], study: [0, 0],         // 진화 모드
   cam: { x: 700, s: 1 }
 };
 const GRAV_B = 560, GRAV_W = 900;
 let MAX_BALL = 120, MAX_BALL_SIDE = 120;   // 팀 하나당 / 진영 전체 공 상한 (셋업에서 조절)
 let MAX_SOLD = 130;                        // 진영당 병사 상한 (셋업에서 조절)
 let USE_SHOP = true;                       // 이 매치에 SHOP 보드를 쓸지 (셋업에서 조절)
-let MODE = 'sim';                          // 'sim' = 시뮬레이션, 'hire' = 고용
+let MODE = 'sim';                          // 'sim' = 시뮬레이션, 'hire' = 고용, 'evo' = 진화
+let STUDY_NEED = 8;                        // STUDY 칸을 몇 번 맞아야 다음 시대로 가는지
 let COIN_START = 10, COIN_EVERY = 10, KILL_W = .67;
 let CTRL = ['human', 'ai'];                // 진영별 조종
 const MAX_CORP = 55;
@@ -958,11 +1013,75 @@ function stepPlinko(dt) {
 
 function popText(x, y, txt, col) { G.pops.push({ x, y, txt, col, life: 1.4 }); }
 
+/* ── 진화 — STUDY 게이지가 차면 다음 시대로 넘어간다 ── */
+function study(team, x, y) {
+  const list = G.eras[team] || [];
+  if (G.era[team] >= list.length - 1) {              // 마지막 시대면 더 갈 데가 없다
+    popText(x, y, '최종 시대', '#8b96a5');
+    return;
+  }
+  G.study[team]++;
+  if (G.study[team] < STUDY_NEED) {
+    popText(x, y, '연구 ' + G.study[team] + '/' + STUDY_NEED, '#7fd8ff');
+    return;
+  }
+  G.study[team] = 0;
+  evolve(team);
+}
+
+function evolve(team) {
+  const list = G.eras[team] || [];
+  if (G.era[team] >= list.length - 1) return;
+  G.era[team]++;
+  const e = list[G.era[team]];
+  G.roster[team] = [TEAMS[e.i]];
+  G.pow[team]   = [e.pow];
+  G.wlock[team] = [wlockOf(e)];
+  G.rspd[team]  = [+e.spd || 1];
+  G.tcol[team]  = [e.col || G.col[team]];
+  G.shopCount[team] = [[0, 0, 0, 0, 0]];
+  G.sciSide[team] = !!TEAMS[e.i].special;
+  G.invin[team]   = !!TEAMS[e.i].invincible;
+  // 보드 칸 수는 새 시대 기준으로 다시 맞춘다
+  fitBoard();
+  // 베이스가 새 시대 모습으로 바뀌면서 조금 회복한다
+  const b = BASE[team];
+  b.hp = Math.min(b.max, b.hp + b.max * .18);
+  let rangedId = null;
+  const td = TEAMS[e.i], lk = G.wlock[team][0];
+  const pool = (lk >= 0 && lk < td.basics.length) ? [td.basics[lk]] : td.basics;
+  rangedId = pool.find(id => WEAPONS[id].type === 'r');
+  b.turret = WEAPONS[rangedId || 'bow'];
+  // 알림
+  G.nums.push({ x: b.x, y: GROUND - b.h - 80, vx: 0, vy: -26,
+                v: (G.era[team] + 1) + '시대 — ' + td.name, col: G.col[team], big: true, life: 3 });
+  G.flash = Math.max(G.flash, .4);
+  G.shock.push({ x: b.x, y: GROUND - b.h * .5, r: 10, life: .9, col: G.col[team] });
+  for (let k = 0; k < 40; k++)
+    G.part.push({ x: b.x + rnd(-b.w / 2, b.w / 2), y: GROUND - rnd(0, b.h),
+                  vx: rnd(-200, 200), vy: rnd(-320, -40), life: 1, col: G.col[team], sz: rnd(2, 4.5) });
+  document.getElementById('nm' + (team ? 'B' : 'A')).textContent = sideName(team);
+}
+
+// 고른 팀들에 맞춰 WEAPON/SHOP 칸 수와 줄 높이를 다시 잡는다
+function fitBoard() {
+  const all = [...G.roster[0], ...G.roster[1]];
+  REG.weapon.slots = Math.max(1, ...all.map(t => t.basics.length));
+  REG.shop.slots   = Math.max(1, ...all.map(t => t.shop.length));
+  const rows = Math.min(ROWS_PAGE, G.roster[0].length + G.roster[1].length);
+  ROW_H = rows <= 4 ? 19 : rows <= 6 ? 14 : 12;
+  REG.weapon.floor = Math.min(120, 8 + rows * ROW_H);
+  REG.shop.floor   = Math.min(126, 8 + rows * ROW_H);
+  buildBoard();
+}
+
 function resolveSlot(team, ti, reg, idx, x, y) {
   if (reg === 'main') {
-    if (idx === 0) { newBall(team, ti, 'main'); newBall(team, ti, 'main'); popText(x, y, 'SPLIT x2', '#7fd8ff'); }
-    else if (idx === 1) newBall(team, ti, 'weapon');
-    else newBall(team, ti, 'shop');
+    const nm = SLOTNAME[idx] || 'SPLIT';
+    if (nm === 'SPLIT') { newBall(team, ti, 'main'); newBall(team, ti, 'main'); popText(x, y, 'SPLIT x2', '#7fd8ff'); }
+    else if (nm === 'WEAPON') newBall(team, ti, 'weapon');
+    else if (nm === 'SHOP') newBall(team, ti, 'shop');
+    else if (nm === 'STUDY') study(team, x, y);
     return;
   }
   const T = G.roster[team][ti], col = G.tcol[team][ti];
@@ -2188,6 +2307,302 @@ function updateCam(dt) {
   G.cam.x += (tx - G.cam.x) * Math.min(1, dt * 2.6);
 }
 
+/* 군대마다 기지 모양이 다르다. 색은 진영 색을 그대로 쓴다. */
+function drawBaseShape(fx, b, col, shape, t) {
+  const L = b.x - b.w / 2, R = b.x + b.w / 2, TOP = GROUND - b.h, W = b.w, H = b.h;
+  const face = t === 0 ? 1 : -1;                     // 적을 바라보는 쪽
+  const dark = 'rgba(0,0,0,.28)', dark2 = 'rgba(0,0,0,.45)';
+  const shadow = () => { fx.fillStyle = 'rgba(0,0,0,.3)'; fx.fillRect(L + 6, TOP + 6, W, H); };
+  const door = (w2, h2) => { fx.fillStyle = dark2; fx.fillRect(b.x - w2, GROUND - h2, w2 * 2, h2); };
+  const tri = (x1, y1, x2, y2, x3, y3) => {
+    fx.beginPath(); fx.moveTo(x1, y1); fx.lineTo(x2, y2); fx.lineTo(x3, y3); fx.closePath(); fx.fill();
+  };
+
+  if (shape === 'cave') {                            // 석기시대 — 바위 동굴
+    fx.fillStyle = 'rgba(0,0,0,.3)';
+    fx.beginPath(); fx.ellipse(b.x + 6, GROUND + 6, W * .62, H * .92, 0, Math.PI, 0); fx.fill();
+    fx.fillStyle = col;
+    fx.beginPath(); fx.ellipse(b.x, GROUND, W * .62, H * .92, 0, Math.PI, 0); fx.fill();
+    fx.fillStyle = 'rgba(255,255,255,.12)';
+    fx.beginPath(); fx.ellipse(b.x - W * .22, GROUND - H * .5, W * .16, H * .2, .4, 0, 6.3); fx.fill();
+    door(17, 48);
+    fx.strokeStyle = 'rgba(0,0,0,.35)'; fx.lineWidth = 3;   // 통나무 울타리
+    for (let i = -2; i <= 2; i++) {
+      const px = b.x + face * (W * .52) + i * 9;
+      fx.beginPath(); fx.moveTo(px, GROUND); fx.lineTo(px, GROUND - 22); fx.stroke();
+    }
+  } else if (shape === 'fort') {                     // 로마 — 각진 요새와 기둥
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L, TOP, W, H);
+    fx.fillStyle = dark; fx.fillRect(L, TOP, W, 14);
+    fx.fillStyle = col;
+    for (let i = 0; i < 6; i++) fx.fillRect(L + i * (W / 6) + 3, TOP - 13, W / 6 - 7, 13);
+    fx.fillStyle = 'rgba(255,255,255,.16)';          // 기둥
+    for (let i = 0; i < 4; i++) fx.fillRect(L + 10 + i * ((W - 20) / 4), TOP + 20, 7, H - 20);
+    fx.fillStyle = col;                              // 지붕 박공
+    tri(L - 6, TOP - 13, b.x, TOP - 34, R + 6, TOP - 13);
+    door(15, 50);
+  } else if (shape === 'tower') {                    // 미래 / 마법사 — 솟은 탑
+    fx.fillStyle = 'rgba(0,0,0,.3)';
+    fx.fillRect(b.x - W * .32 + 6, TOP - 34 + 6, W * .64, H + 34);
+    fx.fillStyle = col;
+    fx.beginPath();
+    fx.moveTo(L + 4, GROUND); fx.lineTo(b.x - W * .3, TOP - 30);
+    fx.lineTo(b.x + W * .3, TOP - 30); fx.lineTo(R - 4, GROUND);
+    fx.closePath(); fx.fill();
+    fx.fillStyle = 'rgba(255,255,255,.2)';
+    for (let i = 1; i <= 3; i++) fx.fillRect(b.x - W * .3, TOP - 30 + i * (H + 30) / 4, W * .6, 4);
+    fx.fillStyle = col;                              // 꼭대기 고리
+    fx.beginPath(); fx.ellipse(b.x, TOP - 38, W * .42, 8, 0, 0, 6.3); fx.fill();
+    fx.fillStyle = 'rgba(255,255,255,.5)';
+    const pulse = (Math.sin(G.t * 3) + 1) / 2;
+    fx.globalAlpha = .4 + .5 * pulse;
+    fx.beginPath(); fx.arc(b.x, TOP - 38, 7, 0, 6.3); fx.fill();
+    fx.globalAlpha = 1;
+    door(14, 46);
+  } else if (shape === 'pyramid') {                  // 이집트 / 아즈텍 — 계단식 피라미드
+    fx.fillStyle = 'rgba(0,0,0,.3)';
+    tri(L + 6, GROUND + 6, b.x + 6, TOP - 16 + 6, R + 6, GROUND + 6);
+    fx.fillStyle = col;
+    const steps = 5;
+    for (let i = 0; i < steps; i++) {
+      const f2 = i / steps, w2 = (W / 2) * (1 - f2 * .82);
+      fx.fillRect(b.x - w2, GROUND - (H + 16) * (i + 1) / steps, w2 * 2, (H + 16) / steps + 1);
+      fx.fillStyle = i % 2 ? col : 'rgba(0,0,0,.14)';
+      fx.fillRect(b.x - w2, GROUND - (H + 16) * (i + 1) / steps, w2 * 2, 3);
+      fx.fillStyle = col;
+    }
+    door(13, 40);
+  } else if (shape === 'bunker') {                   // 현대 — 낮고 두꺼운 벙커
+    shadow();
+    fx.fillStyle = col;
+    fx.beginPath();
+    fx.moveTo(L, GROUND); fx.lineTo(L + 14, TOP + 10);
+    fx.lineTo(R - 14, TOP + 10); fx.lineTo(R, GROUND);
+    fx.closePath(); fx.fill();
+    fx.fillStyle = dark; fx.fillRect(L + 12, TOP + 10, W - 24, 12);
+    fx.fillStyle = col; fx.fillRect(b.x - W * .26, TOP - 14, W * .52, 26);
+    fx.fillStyle = dark2; fx.fillRect(b.x - W * .2, TOP - 6, W * .4, 7);   // 총안
+    fx.fillStyle = 'rgba(255,255,255,.14)';          // 모래주머니
+    for (let i = 0; i < 4; i++)
+      fx.fillRect(b.x + face * (W * .42) - 7 + (i % 2) * 7, GROUND - 10 - Math.floor(i / 2) * 9, 15, 8);
+    door(13, 34);
+  } else if (shape === 'castle') {                   // 중세 — 성벽과 탑
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L, TOP, W, H);
+    fx.fillStyle = dark; fx.fillRect(L, TOP, W, 16);
+    fx.fillStyle = col;
+    for (let i = 0; i < 5; i++) fx.fillRect(L + i * (W / 5) + 2, TOP - 12, W / 5 - 6, 12);
+    fx.fillRect(L - 11, TOP - 26, 20, H + 26);       // 양쪽 망루
+    fx.fillRect(R - 9, TOP - 26, 20, H + 26);
+    fx.fillStyle = dark;
+    fx.fillRect(L - 11, TOP - 26, 20, 7); fx.fillRect(R - 9, TOP - 26, 20, 7);
+    door(15, 46);
+  } else if (shape === 'ice') {                      // 얼음 — 뾰족한 빙벽
+    fx.fillStyle = 'rgba(0,0,0,.25)'; fx.fillRect(L + 6, TOP + 6, W, H);
+    fx.fillStyle = col; fx.fillRect(L, TOP, W, H);
+    fx.fillStyle = 'rgba(255,255,255,.3)';
+    for (let i = 0; i < 4; i++) {
+      const x0 = L + i * (W / 4);
+      tri(x0, TOP, x0 + W / 8, TOP - 30 - (i % 2) * 14, x0 + W / 4, TOP);
+    }
+    fx.fillStyle = 'rgba(255,255,255,.18)'; fx.fillRect(L, TOP, W * .35, H);
+    door(14, 42);
+  } else if (shape === 'hive' || shape === 'organic') {   // 벌집 / 물컹한 둥지
+    fx.fillStyle = 'rgba(0,0,0,.3)';
+    fx.beginPath(); fx.ellipse(b.x + 6, GROUND - H * .45 + 6, W * .56, H * .62, 0, 0, 6.3); fx.fill();
+    fx.fillStyle = col;
+    fx.beginPath(); fx.ellipse(b.x, GROUND - H * .45, W * .56, H * .62, 0, 0, 6.3); fx.fill();
+    fx.beginPath(); fx.ellipse(b.x, GROUND - H * .9, W * .34, H * .34, 0, 0, 6.3); fx.fill();
+    fx.fillStyle = 'rgba(0,0,0,.25)';
+    if (shape === 'hive') for (let i = 0; i < 6; i++) {
+      const a = i / 6 * 6.28;
+      fx.beginPath();
+      fx.arc(b.x + Math.cos(a) * W * .26, GROUND - H * .5 + Math.sin(a) * H * .26, 7, 0, 6.3); fx.fill();
+    } else for (let i = 0; i < 4; i++) {
+      fx.beginPath(); fx.arc(b.x - W * .3 + i * W * .2, GROUND - H * .55, 6 + (i % 2) * 3, 0, 6.3); fx.fill();
+    }
+    door(14, 40);
+  } else if (shape === 'hell') {                     // 악마 / 화염 — 뿔 달린 제단
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L, TOP, W, H);
+    fx.fillStyle = dark; fx.fillRect(L, TOP, W, 14);
+    fx.fillStyle = 'rgba(0,0,0,.42)';                // 뿔은 어둡게 해야 보인다
+    tri(L - 6, TOP - 10, L + 10, TOP - 52, L + 24, TOP - 10);
+    tri(R + 6, TOP - 10, R - 10, TOP - 52, R - 24, TOP - 10);
+    const fl = (Math.sin(G.t * 7) + 1) / 2;
+    fx.fillStyle = '#ff7a3c'; fx.globalAlpha = .5 + .4 * fl;
+    fx.beginPath(); fx.ellipse(b.x, TOP - 10, 16, 10 + fl * 7, 0, 0, 6.3); fx.fill();
+    fx.globalAlpha = 1;
+    door(15, 46);
+  } else if (shape === 'ruin') {                     // 좀비 / 해골 — 무너진 폐허
+    shadow();
+    fx.fillStyle = col;
+    fx.fillRect(L, TOP + 22, W, H - 22);
+    fx.fillRect(L, TOP, W * .42, H);
+    fx.fillRect(b.x + W * .14, TOP + 10, W * .36, H - 10);
+    fx.fillStyle = dark;
+    for (let i = 0; i < 3; i++) fx.fillRect(L + 8 + i * (W / 3), TOP + 30 + (i % 2) * 12, 12, 16);
+    door(14, 40);
+  } else if (shape === 'factory') {                  // 로봇 / 사이보그 / 스팀펑크 — 공장
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L, TOP + 8, W, H - 8);
+    fx.fillStyle = dark;
+    for (let i = 0; i < 3; i++) {                    // 톱니 지붕
+      const x0 = L + i * (W / 3);
+      fx.beginPath(); fx.moveTo(x0, TOP + 8); fx.lineTo(x0 + W / 6, TOP - 10);
+      fx.lineTo(x0 + W / 3, TOP + 8); fx.closePath(); fx.fill();
+    }
+    fx.fillStyle = col; fx.fillRect(b.x + face * W * .3, TOP - 40, 16, 50);   // 굴뚝
+    fx.fillStyle = 'rgba(255,255,255,.22)';
+    for (let i = 0; i < 3; i++)
+      fx.fillRect(L + 12 + i * (W - 28) / 3, TOP + 26, 14, 12);
+    door(13, 36);
+  } else if (shape === 'pagoda') {                   // 사무라이 / 닌자 — 겹지붕
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L + 10, TOP + 14, W - 20, H - 14);
+    for (let i = 0; i < 3; i++) {
+      const y0 = TOP + 14 - i * 22, w2 = (W / 2) * (1 - i * .16) + 12;
+      fx.fillStyle = dark;
+      fx.beginPath();
+      fx.moveTo(b.x - w2, y0); fx.lineTo(b.x - w2 * .5, y0 - 14);
+      fx.lineTo(b.x + w2 * .5, y0 - 14); fx.lineTo(b.x + w2, y0);
+      fx.closePath(); fx.fill();
+      fx.fillStyle = col; fx.fillRect(b.x - w2 * .34, y0 - 14 - 12, w2 * .68, 12);
+    }
+    door(13, 38);
+  } else if (shape === 'ship') {                     // 해적 — 배
+    const deck = GROUND - H * .42;                   // 갑판 높이
+    fx.fillStyle = dark; fx.fillRect(b.x - 5, TOP - 44, 10, deck - TOP + 44);   // 돛대
+    fx.fillStyle = 'rgba(245,242,235,.92)';          // 돛
+    fx.beginPath();
+    fx.moveTo(b.x + face * 5, TOP - 40);
+    fx.lineTo(b.x + face * (W * .62), TOP - 6);
+    fx.lineTo(b.x + face * 5, TOP + 34);
+    fx.closePath(); fx.fill();
+    fx.fillStyle = '#2b2431';                        // 해골 깃발
+    fx.fillRect(b.x - 4, TOP - 56, 30 * face, 14);
+    fx.fillStyle = 'rgba(0,0,0,.3)';                 // 선체 그림자
+    fx.beginPath();
+    fx.moveTo(L - 4 + 6, deck + 6); fx.lineTo(R + 4 + 6, deck + 6);
+    fx.lineTo(R - 16 + 6, GROUND + 6); fx.lineTo(L + 16 + 6, GROUND + 6);
+    fx.closePath(); fx.fill();
+    fx.fillStyle = col;                              // 선체
+    fx.beginPath();
+    fx.moveTo(L - 4, deck); fx.lineTo(R + 4, deck);
+    fx.lineTo(R - 16, GROUND); fx.lineTo(L + 16, GROUND);
+    fx.closePath(); fx.fill();
+    fx.fillStyle = dark; fx.fillRect(L - 4, deck, W + 8, 7);   // 난간
+    fx.fillStyle = 'rgba(0,0,0,.35)';                // 포문
+    for (let i = 0; i < 3; i++)
+      fx.fillRect(L + 14 + i * (W - 30) / 3, deck + 18, 13, 11);
+  } else if (shape === 'ufo') {                      // 외계인 — 떠 있는 접시
+    const hov = Math.sin(G.t * 1.6) * 7;
+    fx.fillStyle = 'rgba(0,0,0,.22)';
+    fx.beginPath(); fx.ellipse(b.x, GROUND - 2, W * .5, 7, 0, 0, 6.3); fx.fill();
+    fx.fillStyle = col;
+    fx.beginPath(); fx.ellipse(b.x, TOP + H * .5 + hov, W * .66, H * .22, 0, 0, 6.3); fx.fill();
+    fx.beginPath(); fx.ellipse(b.x, TOP + H * .34 + hov, W * .3, H * .26, 0, 0, 6.3); fx.fill();
+    fx.fillStyle = 'rgba(255,255,255,.35)';
+    for (let i = -2; i <= 2; i++) {
+      fx.beginPath(); fx.arc(b.x + i * W * .22, TOP + H * .52 + hov, 5, 0, 6.3); fx.fill();
+    }
+    fx.globalAlpha = .18; fx.fillStyle = col;
+    fx.beginPath(); fx.moveTo(b.x - 18, TOP + H * .62 + hov);
+    fx.lineTo(b.x + 18, TOP + H * .62 + hov); fx.lineTo(b.x + 34, GROUND);
+    fx.lineTo(b.x - 34, GROUND); fx.closePath(); fx.fill();
+    fx.globalAlpha = 1;
+  } else if (shape === 'temple') {                   // 천사 — 흰 신전
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L + 8, TOP + 16, W - 16, H - 16);
+    fx.fillStyle = 'rgba(255,255,255,.28)';
+    for (let i = 0; i < 5; i++) fx.fillRect(L + 12 + i * ((W - 24) / 5), TOP + 22, 8, H - 22);
+    fx.fillStyle = col;
+    tri(L - 8, TOP + 16, b.x, TOP - 24, R + 8, TOP + 16);
+    fx.fillStyle = 'rgba(255,255,255,.55)';
+    fx.globalAlpha = .4 + .3 * ((Math.sin(G.t * 2) + 1) / 2);
+    fx.beginPath(); fx.ellipse(b.x, TOP - 34, 20, 6, 0, 0, 6.3); fx.fill();
+    fx.globalAlpha = 1;
+    door(14, 44);
+  } else if (shape === 'hall') {                     // 바이킹 / 융성망 — 긴 집
+    const eave = TOP + H * .34;                      // 처마 높이
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L, eave, W, GROUND - eave);   // 벽
+    fx.fillStyle = dark;                             // 맞배지붕
+    fx.beginPath();
+    fx.moveTo(L - 12, eave); fx.lineTo(b.x, TOP - 18);
+    fx.lineTo(R + 12, eave); fx.closePath(); fx.fill();
+    fx.fillStyle = 'rgba(255,255,255,.12)';          // 지붕 널
+    for (let i = 1; i < 4; i++) {
+      const f2 = i / 4;
+      fx.fillRect(L - 12 + (W + 24) * f2 - 1, eave - (eave - (TOP - 18)) * (1 - Math.abs(f2 - .5) * 2) + 4, 3,
+                  (eave - (TOP - 18)) * (1 - Math.abs(f2 - .5) * 2) - 4);
+    }
+    fx.fillStyle = 'rgba(0,0,0,.3)';                 // 기둥
+    for (let i = 1; i < 4; i++) fx.fillRect(L + W * i / 4 - 3, eave + 6, 6, GROUND - eave - 6);
+    fx.fillStyle = dark;                             // 용머리
+    tri(b.x, TOP - 18, b.x + face * 26, TOP - 44, b.x + face * 6, TOP - 10);
+    door(15, 44);
+  } else if (shape === 'saloon') {                   // 카우보이 — 살롱
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L, TOP + 16, W, H - 16);
+    fx.fillStyle = col; fx.fillRect(L - 8, TOP, W + 16, 18);     // 간판
+    fx.fillStyle = dark; fx.fillRect(L - 8, TOP + 14, W + 16, 5);
+    fx.fillStyle = 'rgba(0,0,0,.2)';
+    fx.fillRect(L + 6, TOP + 26, W - 12, 6);
+    fx.fillStyle = dark2;                            // 스윙도어
+    fx.fillRect(b.x - 17, GROUND - 32, 14, 32);
+    fx.fillRect(b.x + 3, GROUND - 32, 14, 32);
+  } else if (shape === 'kitchen') {                  // 요리사 — 주방
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L, TOP + 10, W, H - 10);
+    fx.fillStyle = dark; fx.fillRect(L - 4, TOP, W + 8, 12);
+    fx.fillStyle = col;                              // 요리사 모자
+    fx.beginPath();
+    fx.arc(b.x - 15, TOP - 12, 12, 0, 6.3); fx.arc(b.x + 15, TOP - 12, 12, 0, 6.3);
+    fx.arc(b.x, TOP - 20, 14, 0, 6.3); fx.fill();
+    fx.fillRect(b.x - 22, TOP - 10, 44, 12);
+    fx.fillStyle = 'rgba(255,255,255,.2)';           // 창
+    for (let i = 0; i < 3; i++) fx.fillRect(L + 12 + i * (W - 28) / 3, TOP + 26, 16, 14);
+    const st = (Math.sin(G.t * 2.4) + 1) / 2;        // 김
+    fx.fillStyle = 'rgba(255,255,255,.3)'; fx.globalAlpha = .3 + .3 * st;
+    fx.beginPath(); fx.arc(b.x + face * 26, TOP - 30 - st * 10, 8, 0, 6.3); fx.fill();
+    fx.globalAlpha = 1;
+    door(14, 38);
+  } else if (shape === 'mushroom') {                 // 버섯 — 자루와 갓
+    const stem = GROUND - H * .52;
+    fx.fillStyle = 'rgba(0,0,0,.3)';
+    fx.beginPath(); fx.ellipse(b.x + 6, stem + 6, W * .62, H * .3, 0, Math.PI, 0); fx.fill();
+    fx.fillStyle = '#e8ddc4';                        // 자루
+    fx.beginPath();
+    fx.moveTo(b.x - W * .26, GROUND);
+    fx.quadraticCurveTo(b.x - W * .17, GROUND - H * .3, b.x - W * .2, stem);
+    fx.lineTo(b.x + W * .2, stem);
+    fx.quadraticCurveTo(b.x + W * .17, GROUND - H * .3, b.x + W * .26, GROUND);
+    fx.closePath(); fx.fill();
+    fx.fillStyle = col;                              // 갓
+    fx.beginPath();
+    fx.moveTo(b.x - W * .62, stem + 4);
+    fx.quadraticCurveTo(b.x - W * .46, GROUND - H - 14, b.x, GROUND - H - 14);
+    fx.quadraticCurveTo(b.x + W * .46, GROUND - H - 14, b.x + W * .62, stem + 4);
+    fx.closePath(); fx.fill();
+    fx.fillStyle = 'rgba(0,0,0,.3)'; fx.fillRect(b.x - W * .62, stem - 2, W * 1.24, 9);
+    fx.fillStyle = 'rgba(255,255,255,.45)';          // 반점
+    for (const [dx, dy, r] of [[-.34, .5, .11], [.2, .62, .09], [.46, .34, .07]]) {
+      fx.beginPath();
+      fx.arc(b.x + W * dx, GROUND - H * (.52 + dy * .5), W * r, 0, 6.3); fx.fill();
+    }
+    door(13, 36);
+  } else {                                           // 기본 — 네모난 요새
+    shadow();
+    fx.fillStyle = col; fx.fillRect(L, TOP, W, H);
+    fx.fillStyle = dark; fx.fillRect(L, TOP, W, 16);
+    fx.fillStyle = col;
+    for (let i = 0; i < 5; i++) fx.fillRect(L + i * (W / 5) + 2, TOP - 12, W / 5 - 6, 12);
+    door(16, 50);
+  }
+}
+
 function drawField() {
   const W = fc.width, H = fc.height, s = G.cam.s;
   const g = fx.createLinearGradient(0, 0, 0, H);
@@ -2244,15 +2659,7 @@ function drawField() {
       }
       fx.fillStyle = 'rgba(0,0,0,.35)';
       fx.fillRect(b.x - 15, GROUND - 44, 30, 44);
-    } else {
-      fx.fillStyle = 'rgba(0,0,0,.3)'; fx.fillRect(b.x - b.w / 2 + 6, GROUND - b.h + 6, b.w, b.h);
-      fx.fillStyle = col; fx.fillRect(b.x - b.w / 2, GROUND - b.h, b.w, b.h);
-      fx.fillStyle = 'rgba(0,0,0,.28)'; fx.fillRect(b.x - b.w / 2, GROUND - b.h, b.w, 16);
-      fx.fillStyle = col;
-      for (let i = 0; i < 5; i++) fx.fillRect(b.x - b.w / 2 + i * (b.w / 5) + 2, GROUND - b.h - 12, b.w / 5 - 6, 12);
-      fx.fillStyle = 'rgba(0,0,0,.35)';
-      fx.fillRect(b.x - 16, GROUND - 50, 32, 50);
-    }
+    } else drawBaseShape(fx, b, col, (G.roster[t][0] && G.roster[t][0].base) || 'keep', t);
     // 포탑 — 체력이 깎일수록 과열되며 강해진다
     const wd = 1 - Math.max(0, b.hp / b.max);
     fx.fillStyle = wd > .3 ? '#ff8a4a' : G.roster[t][0].col;
@@ -2511,7 +2918,7 @@ function drawMini() {
    8. 그리기 — 플링코
    ============================================================ */
 const pc = document.getElementById('plinko'), px = pc.getContext('2d');
-const SLOTNAME = ['SPLIT', 'WEAPON', 'SHOP'];
+let SLOTNAME = ['SPLIT', 'WEAPON', 'SHOP'];     // 시작할 때 모드에 맞게 다시 정한다
 let ROW_H = 19;             // 슬롯 안 한 줄 높이 (팀 수에 따라 조절)
 const ROWS_PAGE = 8;        // 한 화면에 보여줄 최대 줄 수 (넘치면 자동으로 넘김)
 function rosterPage() {     // 지금 보여줄 [진영, 팀인덱스] 목록
@@ -2729,6 +3136,25 @@ function refresh(side) {
     nm.className = 'pname';
     nm.textContent = t.name + (cnt.get(e.i) > 1 ? ' ' + dup : '');
 
+    let eraTag = null, ord = null;
+    if (MODE === 'evo') {                            // 고른 순서가 시대 순서다
+      eraTag = document.createElement('span');
+      eraTag.className = 'eratag'; eraTag.textContent = (k + 1) + '시대';
+      ord = document.createElement('span');
+      ord.className = 'ord';
+      const mv = (dir) => {
+        const j = k + dir;
+        if (j < 0 || j >= sel[si].length) return;
+        const tmp = sel[si][k]; sel[si][k] = sel[si][j]; sel[si][j] = tmp;
+        refresh(side);
+      };
+      const up = document.createElement('button'); up.textContent = '▲';
+      up.disabled = k === 0; up.onclick = () => mv(-1);
+      const dn = document.createElement('button'); dn.textContent = '▼';
+      dn.disabled = k === sel[si].length - 1; dn.onclick = () => mv(1);
+      ord.append(up, dn);
+    }
+
     const sl = document.createElement('input');
     sl.type = 'range'; sl.min = '0.2'; sl.max = '5'; sl.step = '0.1'; sl.value = e.pow;
 
@@ -2736,6 +3162,7 @@ function refresh(side) {
     val.textContent = (+e.pow).toFixed(1) + '×';
     sl.oninput = () => { e.pow = +sl.value; val.textContent = e.pow.toFixed(1) + '×'; netSendTeam(); };
 
+    if (eraTag) row.append(ord, eraTag);
     row.append(dot, nm, sl, val);
     list.appendChild(row);
 
@@ -2838,6 +3265,8 @@ function refresh(side) {
   const btn = document.getElementById('startBtn');
   btn.disabled = !sel[0].length || !sel[1].length;
   btn.textContent = btn.disabled ? '양쪽 진영에서 팀을 고르세요'
+    : MODE === 'evo'
+      ? '진화 대전 시작 (' + sel[0].length + '시대 vs ' + sel[1].length + '시대)'
     : MODE === 'hire' && NET.on
       ? (NET.role === 'host' ? '고용 시작 (온라인 — 방장)' : '방장이 시작하기를 기다리는 중')
     : MODE === 'hire'
@@ -2859,13 +3288,15 @@ ctlB.onclick = () => { if (NET.on) return netSt('온라인에서는 둘 다 사�
   CTRL[1] = CTRL[1] === 'human' ? 'ai' : 'human'; syncCtl(); };
 function setMode(m) {
   MODE = m;
-  if (m !== 'hire' && NET.on) netClose();          // 시뮬레이션으로 가면 연결을 끊는다
+  if (m !== 'hire' && NET.on) netClose();          // 온라인은 고용에서만 쓴다
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
   document.getElementById('hireOpts').style.display = m === 'hire' ? 'block' : 'none';
+  document.getElementById('evoOpts').style.display  = m === 'evo'  ? 'block' : 'none';
   document.querySelectorAll('.simonly').forEach(e => e.style.display = m === 'hire' ? 'none' : '');
-  document.getElementById('subTxt').textContent = m === 'hire'
-    ? '코인으로 병사를 산다. 코인 하나가 공 하나다. 시간이 지나면 코인이 들어오고, 적을 잡아도 들어온다.'
-    : '7초마다 양 팀의 공이 하나씩 떨어진다. 공이 어느 칸에 빠지느냐가 병력을 결정하고, 병력이 상대 베이스를 부수면 이긴다.';
+  document.getElementById('subTxt').textContent =
+    m === 'hire' ? '코인으로 병사를 산다. 코인 하나가 공 하나다. 시간이 지나면 코인이 들어오고, 적을 잡아도 들어온다.'
+  : m === 'evo'  ? '고른 순서대로 시대가 흘러간다. STUDY 칸을 채우면 다음 시대로 넘어가고 부대가 통째로 바뀐다.'
+  : '7초마다 양 팀의 공이 하나씩 떨어진다. 공이 어느 칸에 빠지느냐가 병력을 결정하고, 병력이 상대 베이스를 부수면 이긴다.';
   if (m === 'hire') for (const si of [0, 1]) if (sel[si].length > 1) sel[si] = [sel[si][0]];
   refresh('A'); refresh('B');
 }
@@ -2887,6 +3318,9 @@ document.getElementById('netCopy').onclick = () => {
   catch (e) { netSt('복사가 안 되면 칸의 글자를 직접 전부 골라 복사하세요.'); }
 };
 
+const stRange = document.getElementById('stRange'), stVal = document.getElementById('stVal');
+function syncSt() { stVal.textContent = stRange.value + '개'; }
+stRange.oninput = syncSt; syncSt();
 const coinNum = document.getElementById('coinNum');
 const incRange = document.getElementById('incRange'), incVal = document.getElementById('incVal');
 const wRange = document.getElementById('wRange'), wVal = document.getElementById('wVal');
@@ -2966,6 +3400,7 @@ document.querySelectorAll('.presets button').forEach(b => b.onclick = () => {
     CTRL = m === 'pvp' ? ['human', 'human'] : m === 'eve' ? ['ai', 'ai'] : ['human', 'ai'];
     syncCtl();
   }
+  if (b.dataset.st) { stRange.value = b.dataset.st; syncSt(); }
   if (b.dataset.coin !== undefined) { coinNum.value = b.dataset.coin; }
   if (b.dataset.inc) { incRange.value = b.dataset.inc; syncInc(); }
   if (b.dataset.w !== undefined) { wRange.value = b.dataset.w; syncW(); }
@@ -2996,18 +3431,27 @@ function tintCol(hex, i, n) {
 }
 
 function startGame(asGuest) {
-  G.roster = [sel[0].map(e => TEAMS[e.i]), sel[1].map(e => TEAMS[e.i])];
-  G.pow = [sel[0].map(e => e.pow), sel[1].map(e => e.pow)];
-  G.wlock = [sel[0].map(e => wlockOf(e)), sel[1].map(e => wlockOf(e))];
-  G.rspd  = [sel[0].map(e => +e.spd || 1), sel[1].map(e => +e.spd || 1)];
+  // 진화에서는 고른 순서가 곧 시대 순서다. 판에는 지금 시대 하나만 올라간다.
+  const evo = MODE === 'evo';
+  G.eras = [sel[0].slice(), sel[1].slice()];
+  G.era = [0, 0]; G.study = [0, 0];
+  STUDY_NEED = clamp(parseInt(stRange.value, 10) || 8, 1, 40);
+  const live = t => evo ? [sel[t][0]] : sel[t];
+  G.roster = [live(0).map(e => TEAMS[e.i]), live(1).map(e => TEAMS[e.i])];
+  G.pow = [live(0).map(e => e.pow), live(1).map(e => e.pow)];
+  G.wlock = [live(0).map(e => wlockOf(e)), live(1).map(e => wlockOf(e))];
+  G.rspd  = [live(0).map(e => +e.spd || 1), live(1).map(e => +e.spd || 1)];
   G.col = [colA.value, colB.value];
   // 팀마다 따로 정한 색이 있으면 그것을, 없으면 진영 색을 나눠 쓴다
-  G.tcol = [0, 1].map(t => sel[t].map((e, i) => e.col || tintCol(G.col[t], i, sel[t].length)));
+  G.tcol = [0, 1].map(t => live(t).map((e, i) => e.col || tintCol(G.col[t], i, live(t).length)));
   // 칸 수는 고른 팀들 중 가장 많은 쪽에 맞춘다. 도전 모드처럼 0개인 팀이 있어도 줄어들지 않는다.
   const all = [...G.roster[0], ...G.roster[1]];
   // SHOP을 끄면 BALL DROP은 SPLIT/WEAPON 두 칸이 되고 WEAPON 보드가 아래까지 넓어진다
   USE_SHOP = shopTgl.classList.contains('on');
-  REG.main.slots  = USE_SHOP ? 3 : 2;
+  SLOTNAME = ['SPLIT', 'WEAPON'];
+  if (USE_SHOP) SLOTNAME.push('SHOP');
+  if (evo) SLOTNAME.push('STUDY');               // 진화에는 연구 칸이 하나 더 붙는다
+  REG.main.slots  = SLOTNAME.length;
   REG.shop.hidden = !USE_SHOP;
   REG.weapon.h    = USE_SHOP ? WEAP_H : WEAP_H_TALL;
   REG.weapon.slots = Math.max(1, ...all.map(t => t.basics.length));
@@ -3727,6 +4171,11 @@ function frame(now) {
         ' · 초당 ' + (G.t > 1 ? Math.round(G.dealt[t] / G.t) : 0)
       : '병사 ' + cntN + ' · 처치 ' + G.kills[t] +
         (MODE === 'hire' ? ' · 코인 ' + G.coin[t] : '') +
+        (MODE === 'evo'
+          ? ' · ' + (G.era[t] + 1) + '/' + (G.eras[t] ? G.eras[t].length : 1) + '시대' +
+            (G.eras[t] && G.era[t] < G.eras[t].length - 1
+              ? ' (연구 ' + G.study[t] + '/' + STUDY_NEED + ')' : ' 최종')
+          : '') +
         ' · 베이스 ' + Math.max(0, Math.round(BASE[t].hp)) + rg;
     document.getElementById('stA').textContent = line(0, a);
     document.getElementById('stB').textContent = line(1, b);
