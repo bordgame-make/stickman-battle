@@ -366,6 +366,15 @@ input.pdot:hover{border-color:var(--hi)}
       <input type="range" id="fsRange" min="2" max="8" step="1" value="5">
       <b id="fsVal">5칸</b>
     </div>
+    <div class="row simonly" id="formRow3" style="display:none;margin-top:10px">
+      <label for="nsRange">숫자 칸 수</label>
+      <input type="range" id="nsRange" min="2" max="8" step="1" value="5">
+      <b id="nsVal">5칸</b>
+    </div>
+    <div class="row simonly" id="formRow4" style="display:none;margin-top:10px">
+      <label for="numFixTgl">숫자 고정</label>
+      <button class="mini" id="numFixTgl" style="flex:1;padding:7px">바뀜 (맞으면 다시 뽑기)</button>
+    </div>
     <div class="row simonly" style="margin-top:16px">
       <label for="shopTgl">SHOP 보드</label>
       <button class="mini on" id="shopTgl" style="flex:1;padding:7px">사용함</button>
@@ -401,9 +410,13 @@ input.pdot:hover{border-color:var(--hi)}
     돌진 속도: 팀마다 적에게 다가가는 빠르기를 0.2~3배로 정한다. 가속과 최고 속도가 같이 바뀌고 걷는 동작도 따라간다. 느리게 두면 원거리 팀은 거리를 유지하고, 빠르게 두면 근접 팀이 포화를 뚫고 붙는다. 무마찰 돌격 같은 기술 배율은 여기에 곱해진다.<br>
     전투력은 팀 목록에서 하나씩 조절한다. 그 팀이 뽑는 모든 병사의 공격력에 곱해지고 (0.2~5배), 체력은 위의 공용 막대가 담당한다.<br>
     도전 모드: 무기도 상점도 없고 베이스가 부서지지 않는 표적이다. 반격도 안 한다. 상대편 화력이 얼마나 나오는지 누적 피해와 초당 피해로 보여준다. 순수한 측정을 위해 격전 배율은 꺼진다.<br>
-    수식 보드: 켜면 BALL DROP에 <b>수식</b> 칸이 생기고 아래에 수식 보드가 붙는다. 칸마다 연산이 하나씩 들어 있고, 공이 빠지면 그 연산을 쌓인 값에 적용한 뒤 그 칸을 <b>다시 뽑고</b> 공을 한 번 더 굴린다.<br>
-    <b>=</b> 에 빠지면 그때까지 쌓인 수만큼 공이 BALL DROP에 한꺼번에 쏟아지고 값은 1로 돌아간다. = 칸은 바뀌지 않으니 언제나 끝은 있다.<br>
-    넣을 연산은 +, −, ×, ÷ 중에 고른다 (= 는 늘 들어간다). 칸 수는 2~8개이고, 고른 연산이 몇 개든 칸 수만큼만 무작위로 들어간다. 값은 1~99 사이로 묶인다.<br>
+    수식 보드: 켜면 보드가 둘 늘어난다. <b>수식</b>에는 연산만, <b>숫자 뽑기</b>에는 숫자만 들어 있다. 숫자 칸은 수식 칸과 개수가 같고 뒤로 갈수록 큰 수가 나온다.<br>
+    공이 수식 칸에 빠지면 그 연산을 들고 숫자 뽑기로 넘어가고, 거기서 뽑은 숫자로 쌓인 값을 고친 뒤 다시 수식으로 돌아간다. 맞은 칸은 연산도 숫자도 새로 뽑힌다.<br>
+    <b>=</b> 에 빠지면 그때까지 쌓인 수만큼 공이 WEAPON(과 SHOP)으로 바로 쏟아져 병사가 되고, 값은 1로 돌아간다. = 칸은 바뀌지 않으니 언제나 끝은 있다.<br>
+    수식을 켜면 BALL DROP에서 <b>SPLIT과 WEAPON 칸이 빠진다</b>. 병력은 오직 수식으로만 나온다.<br>
+    넣을 연산은 +, −, ×, ÷ 중에 고른다 (= 는 늘 들어간다). 값은 1~99로 묶인다. ×와 ÷를 빼면 판이 훨씬 차분해진다.<br>
+    수식 칸 수와 숫자 칸 수는 2~8개 사이에서 <b>따로</b> 정한다. 수식 3칸에 숫자 8칸처럼 섞어도 된다.<br>
+    <b>숫자 고정</b>을 켜면 숫자가 판 내내 그대로다. 끄면 공이 들어간 그 칸의 숫자만 새로 뽑힌다 (다른 칸은 그대로).<br>
     SHOP 보드: 끄면 BALL DROP이 SPLIT / WEAPON 두 칸만 남고 상점 보드가 사라진다. 공으로는 상점 병사를 뽑을 수 없고, WEAPON 보드가 빈 자리를 다 쓰도록 아래까지 넓어진다. 동충하초처럼 보드를 거치지 않는 능력은 그대로 상점급 병사를 꺼낸다.<br>
     공과 병사 상한은 각각 진영 하나 기준이고 숫자로 직접 넣을 수 있다. 칸을 비우거나 <b>무한</b>을 누르면 제한이 사라진다. 공은 서로 부딪히지 않으니 많으면 겹쳐 보인다.<br>
     무한으로 두고 공 간격까지 1초로 줄이면 병사가 계속 불어나서 프레임이 크게 떨어진다. 상한은 천장이라서, 기본 설정에서는 올려도 실제 수는 알아서 균형을 잡는다.</div>
@@ -888,7 +901,7 @@ const G = {
   rspd: [[], []],              // [진영][팀] 돌진 속도 배율
   coin: [0, 0], incT: 0, aiT: [0, 0], earn: [0, 0],   // 고용 모드
   eras: [[], []], era: [0, 0], study: [0, 0],         // 진화 모드
-  fslot: [], fval: [1, 1],                            // 수식 보드
+  fslot: [], nslot: [], fval: [1, 1],                 // 수식 / 숫자 뽑기 보드
   cam: { x: 700, s: 1 }
 };
 const GRAV_B = 560, GRAV_W = 900;
@@ -900,6 +913,8 @@ let STUDY_NEED = 8;                        // STUDY 칸을 몇 번 맞아야 다
 let USE_FORM = false;                      // 수식 보드를 쓸지
 let FORM_OPS = ['+', '-', '*', '/'];       // 뽑기에 들어갈 연산 (= 는 늘 들어간다)
 let FORM_SLOTS = 5;                        // 수식 보드 칸 수
+let NUM_SLOTS = 5;                         // 숫자 뽑기 칸 수 (수식과 따로 정한다)
+let NUM_FIX = false;                       // 숫자를 고정할지 (끄면 맞을 때마다 바뀐다)
 const FORM_MAX = 99;                       // 값이 끝없이 불어나지 않게
 let COIN_START = 10, COIN_EVERY = 10, KILL_W = .67;
 let CTRL = ['human', 'ai'];                // 진영별 조종
@@ -925,14 +940,16 @@ const REG = {
   main:   { x: 8, y: 18,  w: 324, h: 214, slots: 3, floor: 40, label: 'BALL DROP' },
   weapon: { x: 8, y: 262, w: 324, h: 186, slots: 5, floor: 46, label: 'WEAPON' },
   shop:   { x: 8, y: 478, w: 324, h: 182, slots: 4, floor: 62, label: 'SHOP', hidden: false },
-  form:   { x: 8, y: 478, w: 324, h: 150, slots: 5, floor: 44, label: '수식', hidden: true }
+  form:   { x: 8, y: 478, w: 324, h: 150, slots: 5, floor: 44, label: '수식', hidden: true },
+  num:    { x: 8, y: 478, w: 324, h: 130, slots: 5, floor: 42, label: '숫자 뽑기', hidden: true }
 };
 /* 켜져 있는 보드만 세로로 나눠 담는다. 보드가 늘어도 알아서 줄어든다. */
-const BOARD_ORDER = ['main', 'weapon', 'shop', 'form'];
-const BOARD_WEIGHT = { main: 1.45, weapon: 1, shop: .95, form: .78 };
+const BOARD_ORDER = ['main', 'weapon', 'shop', 'form', 'num'];
+const BOARD_WEIGHT = { main: 1.45, weapon: 1, shop: .95, form: .78, num: .72 };
 function layoutBoards() {
   const on = BOARD_ORDER.filter(k => !REG[k].hidden);
-  const TOPY = 18, GAP = 26, BOTTOM = 12;
+  const TOPY = 18, BOTTOM = 12;
+  const GAP = on.length >= 4 ? 16 : 26;   // 보드가 많으면 간격을 줄여 판 높이를 남긴다
   const avail = 700 - TOPY - BOTTOM - GAP * (on.length - 1);
   let wsum = 0; for (const k of on) wsum += BOARD_WEIGHT[k];
   let y = TOPY;
@@ -940,7 +957,8 @@ function layoutBoards() {
     const R = REG[k];
     R.y = y;
     R.h = Math.round(avail * BOARD_WEIGHT[k] / wsum);
-    R.floor = Math.min(R.floor, Math.round(R.h * .46));   // 바닥칸이 보드를 다 먹지 않게
+    // 바닥칸이 보드를 다 먹지 않게. 보드가 짧으면 더 얇게 깎아 못 놓을 높이를 남긴다.
+    R.floor = Math.min(R.floor, Math.max(26, Math.round(R.h * .36)));
     y += R.h + GAP;
   }
 }
@@ -960,8 +978,18 @@ function buildBoard() {
     const gapY = 38, gapX = big ? 50 : 46, br = big ? 8 : 6.5;
     const edge = size * 1.42 + br + 3;   // 벽과 못 사이는 공이 지나갈 만큼 띄운다
     const slotW = R.w / R.slots;
-    let nRows = 0;
-    for (let y = R.y + 44; y < lineY - 22; y += gapY) nRows++;
+    // 보드가 짧으면 고정 간격으로는 못이 한 줄도 안 들어가서 공이 그냥 떨어진다.
+    // 그러면 떨어뜨린 자리가 그대로 결과가 돼 양 끝 칸이 손해를 본다. 짧으면 간격을 좁힌다.
+    const room = lineY - R.y;
+    const rowsIn = (t, bo, g) => { let n = 0; for (let y = R.y + t; y < lineY - bo; y += g) n++; return n; };
+    const want = clamp(R.slots - 1, 1, 4);   // 칸이 많을수록 섞을 줄이 더 필요하다
+    let top = 44, bot = 22, gy = gapY;
+    if (rowsIn(top, bot, gy) < want) {
+      top = Math.max(30, Math.round(room * .26));   // 공이 들어오는 자리와 겹치지 않게
+      bot = Math.max(10, Math.round(room * .17));
+      gy  = Math.max(27, (lineY - bot - (R.y + top)) / Math.max(1, want - 1) + .01);
+    }
+    let nRows = rowsIn(top, bot, gy);
     // 못을 왼쪽부터 깔면 오른쪽에 빈 구역이 남아서 그 칸만 유난히 잘 나온다.
     // 줄 수에 따라 공정한 배치가 다르다. 아래 두 방식은 분포를 측정해서 고른 것이다.
     let cols, dx, phase;
@@ -978,7 +1006,7 @@ function buildBoard() {
       dx = R.w / cols; phase = 0;
     }
     let row = 0;
-    for (let y = R.y + 44; y < lineY - 22; y += gapY, row++) {
+    for (let y = R.y + top; y < lineY - bot; y += gy, row++) {
       const gap = (row % 2) !== phase;                // 이 줄이 틈에 들어가는 줄인지
       const n = gap ? cols - 1 : cols;
       for (let c = 0; c < n; c++) {
@@ -1004,9 +1032,11 @@ function newBall(team, ti, reg, x) {
   // 가운데 한 점에서만 떨어뜨리면 갈톤 보드가 돼서 바깥 칸이 거의 안 나온다.
   G.balls.push({
     team, ti, reg, r,
-    x: x !== undefined ? x : R.x + r + 3 + Math.random() * (R.w - 2 * r - 6),
-    y: R.y + 16, vx: rnd(-18, 18), vy: 0, st: 0, ly: R.y + 16
+    x: x !== undefined ? x
+         : clamp(R.x + Math.random() * R.w, R.x + r + 1, R.x + R.w - r - 1),
+    y: R.y + 16, vx: rnd(-18, 18), vy: 0, st: 0, ly: R.y + 16, op: null
   });
+  return G.balls[G.balls.length - 1];
 }
 
 function hitBox(b, cx, cy, hw, hh, ang) {
@@ -1064,7 +1094,7 @@ function stepPlinko(dt) {
     if (b.y >= trigger) {
       const idx = clamp(Math.floor((b.x - R.x) / (R.w / R.slots)), 0, R.slots - 1);
       G.balls.splice(i, 1);
-      resolveSlot(b.team, b.ti, b.reg, idx, b.x, b.y);
+      resolveSlot(b.team, b.ti, b.reg, idx, b.x, b.y, b);
     }
   }
 }
@@ -1081,11 +1111,19 @@ const OPSIGN = { '+': '+', '-': '−', '*': '×', '/': '÷', '=': '=' };
 
 function rollOp() {                                  // '=' 를 뺀 연산 중 하나
   const pool = FORM_OPS.length ? FORM_OPS : ['+'];
-  const op = pool[Math.floor(Math.random() * pool.length)];
-  const n = op === '*' ? 2 + Math.floor(Math.random() * 3)      // ×2~4
-          : op === '/' ? 2 + Math.floor(Math.random() * 2)      // ÷2~3
-          : 1 + Math.floor(Math.random() * 9);                  // +,- 는 1~9
-  return { op, n };
+  return { op: pool[Math.floor(Math.random() * pool.length)] };
+}
+
+// 숫자 칸 — 뒤로 갈수록 큰 수가 나온다. 칸이 몇 개든 뒤쪽이 커지도록 칸 수에 맞춰 늘린다.
+function rollNum(i) {
+  const step = 10 / Math.max(1, NUM_SLOTS - 1);      // 칸이 적으면 더 크게 벌어진다
+  const lo = Math.round(1 + step * i);
+  const hi = Math.round(3 + step * 1.5 * i);
+  return lo + Math.floor(Math.random() * Math.max(1, hi - lo + 1));
+}
+function buildNums() {
+  G.nslot = [];
+  for (let i = 0; i < NUM_SLOTS; i++) G.nslot.push(rollNum(i));
 }
 
 function buildFormula() {
@@ -1098,8 +1136,9 @@ function buildFormula() {
     const k = Math.floor(Math.random() * FORM_SLOTS);
     if (idx.indexOf(k) < 0) idx.push(k);
   }
-  for (const k of idx) G.fslot[k] = { op: '=', n: 0 };
+  for (const k of idx) G.fslot[k] = { op: '=' };
   G.fval = [1, 1];
+  buildNums();
 }
 
 function applyOp(v, op, n) {
@@ -1115,17 +1154,30 @@ function formula(team, ti, idx, x, y) {
   const sl = G.fslot[idx];
   if (!sl) return;
   const col = G.tcol[team][ti];
-  if (sl.op === '=') {                               // 쌓인 수만큼 병력을 뽑는다
+  if (sl.op === '=') {                               // 쌓인 수만큼 병력이 쏟아진다
     const n = clamp(Math.round(G.fval[team]), 1, FORM_MAX);
-    for (let k = 0; k < n; k++) newBall(team, ti, 'main');
-    popText(x, y, '= ' + n + '개', col);
+    for (let k = 0; k < n; k++)
+      newBall(team, ti, (USE_SHOP && Math.random() < .35) ? 'shop' : 'weapon');
+    popText(x, y, '= ' + n + '명', col);
     G.fval[team] = 1;
     return;
   }
-  G.fval[team] = applyOp(G.fval[team], sl.op, sl.n);
-  // 연산은 공이 쉴 새 없이 지나가므로 글자를 띄우지 않는다. 값은 보드 위에 계속 보인다.
+  // 연산만 정해지고, 숫자는 숫자 뽑기 보드에서 고른다
   G.fslot[idx] = rollOp();                           // 맞은 칸은 다시 뽑힌다
-  newBall(team, ti, 'form');                         // 그리고 한 번 더 굴린다
+  const nb = newBall(team, ti, 'num');
+  if (nb) nb.op = sl.op;
+}
+
+// 숫자 뽑기 — 공이 들고 온 연산에 이 숫자를 써서 값을 고친다
+function numDraw(team, ti, idx, x, y, ball) {
+  const n = G.nslot[idx];
+  if (n === undefined) return;
+  const op = (ball && ball.op) || '+';
+  const before = G.fval[team];
+  G.fval[team] = applyOp(before, op, n);
+  popText(x, y, OPSIGN[op] + n + ' → ' + G.fval[team], '#7fd8ff');
+  if (!NUM_FIX) G.nslot[idx] = rollNum(idx);         // 고정이 아니면 맞은 칸만 다시 뽑힌다
+  newBall(team, ti, 'form');                         // 그리고 수식으로 한 번 더
 }
 
 /* ── 진화 — STUDY 게이지가 차면 다음 시대로 넘어간다 ── */
@@ -1191,7 +1243,7 @@ function fitBoard() {
   buildBoard();
 }
 
-function resolveSlot(team, ti, reg, idx, x, y) {
+function resolveSlot(team, ti, reg, idx, x, y, ball) {
   if (reg === 'main') {
     const nm = SLOTNAME[idx] || 'SPLIT';
     if (nm === 'SPLIT') { newBall(team, ti, 'main'); newBall(team, ti, 'main'); popText(x, y, 'SPLIT x2', '#7fd8ff'); }
@@ -1202,6 +1254,7 @@ function resolveSlot(team, ti, reg, idx, x, y) {
     return;
   }
   if (reg === 'form') { formula(team, ti, idx, x, y); return; }
+  if (reg === 'num')  { numDraw(team, ti, idx, x, y, ball); return; }
   const T = G.roster[team][ti], col = G.tcol[team][ti];
   if (reg === 'weapon') {
     // 무기를 하나로 고정한 팀은 어느 칸에 떨어지든 그 무기만 나온다
@@ -3142,6 +3195,26 @@ function drawPlinko() {
     px.fillText((PG.pg + 1) + '/' + PG.pages, Sg.x + Sg.w - 3, sLine - 3);
   }
 
+  // 숫자 뽑기 칸 — 뒤로 갈수록 큰 수
+  const Ng = REG.num;
+  if (!Ng.hidden) {
+    const nw = Ng.w / Ng.slots, nLine = Ng.y + Ng.h - Ng.floor;
+    if (NUM_FIX) {
+      px.fillStyle = '#5c6a7c'; px.font = '700 9px system-ui'; px.textAlign = 'right';
+      px.fillText('고정', Ng.x + Ng.w - 4, Ng.y + 12);
+    }
+    for (let i = 0; i < Ng.slots; i++) {
+      const v = G.nslot[i]; if (v === undefined) continue;
+      const cx = Ng.x + nw * (i + .5);
+      const hot = i / Math.max(1, Ng.slots - 1);
+      px.textAlign = 'center';
+      px.fillStyle = 'rgb(' + Math.round(170 + 85 * hot) + ',' +
+                     Math.round(210 - 40 * hot) + ',' + Math.round(240 - 130 * hot) + ')';
+      px.font = '800 ' + (nw > 56 ? 17 : 14) + 'px system-ui';
+      px.fillText(v, cx, nLine + Ng.floor * .62);
+    }
+  }
+
   // 수식 칸 — 연산과 지금 쌓인 값
   const Fg = REG.form;
   if (!Fg.hidden) {
@@ -3152,8 +3225,8 @@ function drawPlinko() {
       const eq = sl.op === '=';
       px.textAlign = 'center';
       px.fillStyle = eq ? '#ffd76a' : '#c8d2de';
-      px.font = (eq ? '800 ' : '700 ') + (fw > 56 ? 17 : 14) + 'px system-ui';
-      px.fillText(eq ? '=' : OPSIGN[sl.op] + sl.n, cx, fLine + Fg.floor * .62);
+      px.font = '800 ' + (fw > 56 ? 21 : 17) + 'px system-ui';
+      px.fillText(eq ? '=' : OPSIGN[sl.op], cx, fLine + Fg.floor * .62);
     }
     px.font = '800 11px system-ui';
     px.textAlign = 'left';  px.fillStyle = G.col[0];
@@ -3470,13 +3543,21 @@ document.getElementById('netCopy').onclick = () => {
 
 const formTgl = document.getElementById('formTgl');
 const fsRange = document.getElementById('fsRange'), fsVal = document.getElementById('fsVal');
-function syncFs() { fsVal.textContent = fsRange.value + '칸'; }
-fsRange.oninput = syncFs; syncFs();
+const nsRange = document.getElementById('nsRange'), nsVal = document.getElementById('nsVal');
+const numFixTgl = document.getElementById('numFixTgl');
+function syncFs() { fsVal.textContent = fsRange.value + '칸'; nsVal.textContent = nsRange.value + '칸'; }
+fsRange.oninput = syncFs; nsRange.oninput = syncFs; syncFs();
+numFixTgl.onclick = () => {
+  numFixTgl.classList.toggle('on');
+  numFixTgl.textContent = numFixTgl.classList.contains('on')
+    ? '고정 (안 바뀜)' : '바뀜 (맞으면 다시 뽑기)';
+};
 function syncForm() {
   const on = formTgl.classList.contains('on');
   formTgl.textContent = on ? '사용함' : '사용 안 함';
-  document.getElementById('formRow1').style.display = on && MODE !== 'hire' ? 'flex' : 'none';
-  document.getElementById('formRow2').style.display = on && MODE !== 'hire' ? 'flex' : 'none';
+  const show = on && MODE !== 'hire' ? 'flex' : 'none';
+  for (const id of ['formRow1', 'formRow2', 'formRow3', 'formRow4'])
+    document.getElementById(id).style.display = show;
 }
 formTgl.onclick = () => { formTgl.classList.toggle('on'); syncForm(); };
 document.querySelectorAll('.opbtn[data-op]').forEach(b => b.onclick = () => {
@@ -3627,15 +3708,20 @@ function startGame(asGuest) {
                .map(b => b.dataset.op);
   if (!FORM_OPS.length) FORM_OPS = ['+'];
   FORM_SLOTS = clamp(parseInt(fsRange.value, 10) || 5, 2, 8);
-  SLOTNAME = ['SPLIT', 'WEAPON'];
+  NUM_SLOTS  = clamp(parseInt(nsRange.value, 10) || 5, 2, 8);
+  NUM_FIX    = numFixTgl.classList.contains('on');
+  // 수식을 켜면 병력은 수식으로만 나온다. SPLIT/WEAPON 칸은 빠진다.
+  SLOTNAME = USE_FORM ? [] : ['SPLIT', 'WEAPON'];
   if (USE_SHOP) SLOTNAME.push('SHOP');
   if (evo) SLOTNAME.push('STUDY');               // 진화에는 연구 칸이 하나 더 붙는다
   if (USE_FORM) SLOTNAME.push('수식');
   REG.main.slots  = SLOTNAME.length;
   REG.shop.hidden = !USE_SHOP;
   REG.form.hidden = !USE_FORM;
+  REG.num.hidden  = !USE_FORM;
   REG.form.slots  = FORM_SLOTS;
-  REG.form.floor  = 44;
+  REG.num.slots   = NUM_SLOTS;
+  REG.form.floor  = 44; REG.num.floor = 42;
   REG.weapon.floor = 46; REG.shop.floor = 62; REG.main.floor = 40;
   buildFormula();
   REG.weapon.slots = Math.max(1, ...all.map(t => t.basics.length));
