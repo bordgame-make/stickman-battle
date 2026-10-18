@@ -387,6 +387,10 @@ input.pdot:hover{border-color:var(--hi)}
       <button data-fmax="999">999명</button>
     </div>
     <div class="row simonly" style="margin-top:16px">
+      <label for="wpnTgl">WEAPON 보드</label>
+      <button class="mini on" id="wpnTgl" style="flex:1;padding:7px">사용함</button>
+    </div>
+    <div class="row simonly" style="margin-top:10px">
       <label for="shopTgl">SHOP 보드</label>
       <button class="mini on" id="shopTgl" style="flex:1;padding:7px">사용함</button>
     </div>
@@ -431,6 +435,8 @@ input.pdot:hover{border-color:var(--hi)}
     <b>공 하나의 상한</b>은 공 안의 수가 어디까지 커질 수 있는지다 (2~999명, 기본 99명). 연산 결과는 늘 1 이상 이 값 이하로 묶인다. 낮추면 한 방에 쏟아지는 양이 줄어 판이 고르게 가고, 올리면 대박 공 하나로 갈린다. (판에 동시에 떠 있는 공 수는 따로 <b>최대 공 개수</b>에서 정한다.)<br>
     수식 칸 수와 숫자 칸 수는 2~8개 사이에서 <b>따로</b> 정한다. 수식 3칸에 숫자 8칸처럼 섞어도 된다.<br>
     <b>숫자 고정</b>을 켜면 숫자가 판 내내 그대로다. 끄면 공이 들어간 그 칸의 숫자만 새로 뽑힌다 (다른 칸은 그대로).<br>
+    WEAPON 보드: 끄면 기본 무기 보드가 사라지고 <b>SHOP 으로만</b> 싸운다. BALL DROP 에는 SPLIT / SHOP 만 남고, 공은 모두 상점 물건 값으로 들어간다. 값이 비싼 만큼 병사는 드물게, 대신 센 놈들만 나온다. (동충하초처럼 보드를 안 거치고 기본 병사를 부르는 능력은 그대로 나온다.)<br>
+    WEAPON 과 SHOP 은 <b>둘 다 끌 수는 없다</b> — 하나를 끄면 다른 쪽이 자동으로 켜진다.<br>
     SHOP 보드: 끄면 BALL DROP이 SPLIT / WEAPON 두 칸만 남고 (수식을 켠 경우는 위 설명대로) 상점 보드가 사라진다. 공으로는 상점 병사를 뽑을 수 없고, WEAPON 보드가 빈 자리를 다 쓰도록 아래까지 넓어진다. 동충하초처럼 보드를 거치지 않는 능력은 그대로 상점급 병사를 꺼낸다.<br>
     공과 병사 상한은 각각 진영 하나 기준이고 숫자로 직접 넣을 수 있다. 칸을 비우거나 <b>무한</b>을 누르면 제한이 사라진다. 공은 서로 부딪히지 않으니 많으면 겹쳐 보인다.<br>
     무한으로 두고 공 간격까지 1초로 줄이면 병사가 계속 불어나서 프레임이 크게 떨어진다. 상한은 천장이라서, 기본 설정에서는 올려도 실제 수는 알아서 균형을 잡는다.</div>
@@ -922,6 +928,7 @@ const GRAV_B = 560, GRAV_W = 900;
 let MAX_BALL = 120, MAX_BALL_SIDE = 120;   // 팀 하나당 / 진영 전체 공 상한 (셋업에서 조절)
 let MAX_SOLD = 130;                        // 진영당 병사 상한 (셋업에서 조절)
 let USE_SHOP = true;                       // 이 매치에 SHOP 보드를 쓸지 (셋업에서 조절)
+let USE_WPN  = true;                       // WEAPON 보드를 쓸지 — 끄면 SHOP 으로만 싸운다
 let MODE = 'sim';                          // 'sim' = 시뮬레이션, 'hire' = 고용, 'evo' = 진화
 let STUDY_NEED = 8;                        // STUDY 칸을 몇 번 맞아야 다음 시대로 가는지
 let USE_FORM = false;                      // 수식 보드를 쓸지
@@ -1207,7 +1214,7 @@ function formula(team, ti, idx, x, y, ball) {
   if (sl.op === '=') {                               // 수가 정해졌다 — 이제 쓸 곳을 고른다
     G.fval[team] = val;
     // 고를 게 WEAPON 뿐이면 BALL DROP 을 건너뛴다. 어느 쪽이든 공은 하나 그대로다.
-    newBall(team, ti, REG.main.hidden ? 'weapon' : 'main', undefined, val);
+    newBall(team, ti, REG.main.hidden ? (USE_WPN ? 'weapon' : 'shop') : 'main', undefined, val);
     popText(x, y, '= ' + val, col);
     return;
   }
@@ -1254,7 +1261,14 @@ function evolve(team) {
   G.wlock[team] = [wlockOf(e)];
   G.rspd[team]  = [+e.spd || 1];
   G.tcol[team]  = [e.col || G.col[team]];
-  G.shopCount[team] = [[0, 0, 0, 0, 0]];
+  // 모아 둔 상점 값은 시대가 바뀌어도 가져간다. 예전엔 다 날아가서,
+  // SHOP 으로만 싸우면 비싼 물건을 영영 못 사는 판이 됐다.
+  // 다만 넘어오자마자 공짜로 사지지 않게 새 물건 값 바로 아래까지만 남긴다.
+  const prev = G.shopCount[team][0] || [], nsh = TEAMS[e.i].shop || [];
+  G.shopCount[team] = [[0, 1, 2, 3, 4].map(i => {
+    const c = Math.max(1, (nsh[i] && nsh[i].cost) || 1);
+    return clamp(Math.round(prev[i] || 0), 0, c - 1);
+  })];
   G.sciSide[team] = !!TEAMS[e.i].special;
   G.invin[team]   = !!TEAMS[e.i].invincible;
   // 보드 칸 수는 새 시대 기준으로 다시 맞춘다
@@ -1295,7 +1309,10 @@ function resolveSlot(team, ti, reg, idx, x, y, ball) {
   if (reg === 'main') {
     const nm = SLOTNAME[idx] || 'SPLIT';
     const val = (ball && ball.val) || 1;
-    if (nm === 'SPLIT') { newBall(team, ti, 'main'); newBall(team, ti, 'main'); popText(x, y, 'SPLIT x2', '#7fd8ff'); }
+    if (nm === 'SPLIT') {
+      newBall(team, ti, 'main'); newBall(team, ti, 'main');
+      if (G.balls.length < 40) popText(x, y, 'SPLIT x2', '#7fd8ff');   // 공이 많으면 글씨가 판을 덮는다
+    }
     else if (nm === 'WEAPON') newBall(team, ti, 'weapon', undefined, val);   // 수는 그대로 들고 간다
     else if (nm === 'SHOP')   newBall(team, ti, 'shop',   undefined, val);
     else if (nm === 'STUDY')  study(team, x, y, USE_FORM ? val : 1);
@@ -3213,7 +3230,7 @@ function drawPlinko() {
   // WEAPON 칸 — 고른 팀 수만큼 줄이 늘어난다
   const Wg = REG.weapon, ww = Wg.w / Wg.slots, wLine = Wg.y + Wg.h - Wg.floor;
   const RH = ROW_H, PG = rosterPage();
-  for (let i = 0; i < Wg.slots; i++) {
+  for (let i = 0; !Wg.hidden && i < Wg.slots; i++) {
     const cx = Wg.x + ww * (i + .5);
     PG.list.forEach(([t, k], r) => {
       const T = G.roster[t][k], lock = G.wlock[t][k];
@@ -3696,11 +3713,20 @@ szRange.oninput = syncSz; syncSz();
 const ballNum = document.getElementById('ballNum'), ballInf = document.getElementById('ballInf');
 const soldNum = document.getElementById('soldNum'), soldInf = document.getElementById('soldInf');
 const shopTgl = document.getElementById('shopTgl');
-shopTgl.onclick = () => {
-  const on = !shopTgl.classList.contains('on');
-  shopTgl.classList.toggle('on', on);
-  shopTgl.textContent = on ? '사용함' : '사용 안 함';
-};
+const wpnTgl  = document.getElementById('wpnTgl');
+// WEAPON 과 SHOP — 하나는 반드시 켜져 있어야 병사가 나온다. 하나를 끄면 다른 쪽이 켜진다.
+function setBoardTgl(btn, on) {
+  btn.classList.toggle('on', on);
+  btn.textContent = on ? '사용함' : '사용 안 함';
+}
+function boardTgl(btn, other) {
+  btn.onclick = () => {
+    const on = !btn.classList.contains('on');
+    setBoardTgl(btn, on);
+    if (!on && !other.classList.contains('on')) setBoardTgl(other, true);
+  };
+}
+boardTgl(shopTgl, wpnTgl); boardTgl(wpnTgl, shopTgl);
 const INF = { ball: false, sold: false };
 function syncInf() {
   ballInf.classList.toggle('on', INF.ball); ballNum.disabled = INF.ball;
@@ -3777,6 +3803,8 @@ function startGame(asGuest) {
   const all = [...G.roster[0], ...G.roster[1]];
   // SHOP을 끄면 BALL DROP은 SPLIT/WEAPON 두 칸이 되고 WEAPON 보드가 아래까지 넓어진다
   USE_SHOP = shopTgl.classList.contains('on');
+  USE_WPN  = MODE === 'hire' || wpnTgl.classList.contains('on');
+  if (!USE_WPN && !USE_SHOP) USE_WPN = true;      // 둘 다 끄면 병사가 안 나온다
   USE_FORM = MODE !== 'hire' && formTgl.classList.contains('on');
   FORM_OPS = [...document.querySelectorAll('.opbtn')].filter(b => b.classList.contains('on'))
                .map(b => b.dataset.op);
@@ -3787,7 +3815,8 @@ function startGame(asGuest) {
   FORM_MAX   = clamp(Math.floor(+fmaxNum.value) || 99, 2, 999);   // 공 하나가 될 수 있는 최대 병력
   // 수식을 켜면 공은 수식에서 시작한다. BALL DROP 은 '=' 로 수가 정해진 뒤
   // 그 수를 어디에 쓸지 고르는 칸이 된다. SPLIT 은 빠진다.
-  SLOTNAME = USE_FORM ? ['WEAPON'] : ['SPLIT', 'WEAPON'];
+  SLOTNAME = USE_FORM ? [] : ['SPLIT'];
+  if (USE_WPN) SLOTNAME.push('WEAPON');
   if (USE_SHOP) SLOTNAME.push('SHOP');
   if (evo) SLOTNAME.push('STUDY');               // 진화에는 연구 칸이 하나 더 붙는다
   REG.main.slots  = SLOTNAME.length;
@@ -3795,6 +3824,7 @@ function startGame(asGuest) {
   // 고를 게 하나뿐이면 BALL DROP 을 거칠 이유가 없다 — 바로 WEAPON 으로 간다
   REG.main.hidden = USE_FORM && SLOTNAME.length < 2;
   REG.shop.hidden = !USE_SHOP;
+  REG.weapon.hidden = !USE_WPN;
   REG.form.hidden = !USE_FORM;
   REG.num.hidden  = !USE_FORM;
   REG.form.slots  = FORM_SLOTS;
